@@ -1,9 +1,16 @@
 {
+  "name": "IdeaVault",
+  "version": "1.0.0",
+  "productName": "IdeaVault",
+  "description": "A desktop note and idea management app built with Electron.",
   "main": "src/main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build:mac": "electron-packager . IdeaVault --platform=darwin --arch=x64 --icon=/Users/erkhembilegariunbold/Desktop/IdeaVault/assets/icon.icns --overwrite",
+    "build:win": "electron-packager . IdeaVault --platform=win32 --arch=x64 --icon=assets/icon.ico --overwrite"
   },
-   "devDependencies": {
-    "electron": "^39.1.1"
+  "devDependencies": {
+    "electron": "^39.1.1",
+    "electron-packager": "^17.1.2"
   }
 }

@@ -20,9 +20,11 @@
       Sign in
       <div class="username-border">
         <i class="fa-solid fa-user" style="color: #7b5028"></i>
-        <label for="username">Username</label>
+        <input type="text" name="Username" />
       </div>
+
       <div class="password-border">
+        <i class="fa-solid fa-lock" id="toggleLock" style="color: #7b5028"></i>
         <input type="password" id="password" name="password" />
         <i
           class="fa-solid fa-eye-slash"
@@ -30,7 +32,16 @@
           style="color: #7b5028; cursor: pointer"
         ></i>
       </div>
+
+      <div class="login-border">
+        <button onclick="checkPassword()">Login</button>
+      </div>
     </div>
+
+    <!-- Debuging
+    <div id="myPassword">
+
+    </div> -->
   </body>
   <script src="login.js"></script>
 </html>
