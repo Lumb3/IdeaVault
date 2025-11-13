@@ -1,5 +1,7 @@
 const togglePassword = document.getElementById("togglePassword");
 const password = document.getElementById("password");
+const toggle_Lock = document.getElementById("toggleLock");
+const username = document.getElementById("username");
 
 togglePassword.addEventListener("click", function () {
   // Toggle password visibility
@@ -11,14 +13,12 @@ togglePassword.addEventListener("click", function () {
   this.classList.toggle("fa-eye");
 });
 
-const toggle_Lock = document.getElementById('toggleLock');
-const passwordInput = document.getElementById('password');
-
-function checkPassword() {
-  const pass = passwordInput.value;
-
-  if (pass === 'HUU') {     
-    toggle_Lock.classList.add("fa-lock-open");     
+// Will be encrypted through hashing
+function checkPasswordandUsername() {
+  const pass = password.value;
+  const user = username.value;
+  if (pass === "HUU" && user === "Eric") {
+    toggle_Lock.classList.add("fa-lock-open");
     console.log("true");
     window.location.href = "index.html";
   } else {

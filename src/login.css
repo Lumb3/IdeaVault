@@ -1,6 +1,112 @@
-:root {
-    --bg-primary: rgb(245, 199, 140);
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
+
 body {
-    background-color: var(--bg-primary);
+  background: linear-gradient(135deg, #faf8f6, #f0ebe7);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #3c2f2f;
+}
+
+/* Heading */
+h1 {
+  margin-bottom: 40px;
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: #4b3621;
+  letter-spacing: 0.5px;
+}
+
+/* Main border (login box) */
+.border {
+  background: #fff;
+  padding: 40px 50px;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  width: 320px;
+  text-align: center;
+  font-size: 1.1rem;
+  color: #7b5028;
+  font-weight: 500;
+}
+
+/* Input containers */
+.username-border,
+.password-border {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-top: 20px;
+  background-color: #faf9f8;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.username-border:focus-within,
+.password-border:focus-within {
+  border-color: #7b5028;
+  background-color: #fff;
+}
+
+/* Input fields */
+input {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 1rem;
+  background: transparent;
+  color: #3c2f2f;
+}
+
+/* Login button */
+.login-border {
+  margin-top: 30px;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  background-color: #7b5028;
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+button:hover {
+  background-color: #603c1f;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* Icons */
+i {
+  font-size: 1.1rem;
+}
+
+/* Responsive */
+@media (max-width: 400px) {
+  .border {
+    width: 85%;
+    padding: 30px 25px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
 }
