@@ -1,49 +1,37 @@
+// main.js
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const bcrypt = require("bcryptjs");
 const { Client } = require("pg");
 
+// PostgreSQL client setup
 const client = new Client({
+  user: "eric", // your DB user
   host: "localhost",
-  user: "Eric",
-  password: "1234",
-  database: "ideavault",
+  database: "my_database",
+  password: "", // add DB password if needed
+  port: 5432,
 });
 
+// Initialize database and ensure users table exists
 async function initDatabase() {
-  await client.connect();
-
-  const hashed = bcrypt.hashSync("HUU", 10);
   try {
-    await client.query(
-      `INSERT INTO users (username, password_hash) VALUES ($1, $2) ON CONFLICT (username) DO NOTHING`,
-      ["Eric", hashed]
-    );
+    await client.connect();
+    const query = `
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(50) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL
+      );
+    `;
+    await client.query(query);
+    console.log("Database initialized and users table ready!");
   } catch (err) {
-    console.log("DB init failed: ", err);
+    console.error("Error initializing database:", err);
   }
 }
 
-ipcMain.handle("login-attempt", async (event, { username, password }) => {
-  try {
-    const res = await client.query(
-      "SELECT * FROM users WHERE username = $1",
-      [username]
-    );
-
-    if (res.rows.length === 0) return { success: false };
-
-    const user = res.rows[0];
-    const match = bcrypt.compareSync(password, user.password_hash);
-
-    return { success: match };
-  } catch (err) {
-    console.error("Login error:", err);
-    return { success: false };
-  }
-});
-
-
+// Create Electron window
 function createWindow() {
   const win = new BrowserWindow({
     width: 900,
@@ -59,8 +47,40 @@ function createWindow() {
   win.loadFile(path.join(__dirname, "login.html"));
 }
 
+// Handle login attempt from renderer
+ipcMain.handle("login-attempt", async (event, { username, password }) => {
+  try {
+    // Query user by username
+    const res = await client.query(
+      "SELECT * FROM users WHERE username = $1",
+      [username]
+    );
+
+    if (res.rows.length === 0) {
+      return { success: false, message: "User not found" };
+    }
+
+    const user = res.rows[0];
+    const valid = bcrypt.compareSync(password, user.password);
+
+    if (valid) {
+      return { success: true, message: "Login successful" };
+    } else {
+      return { success: false, message: "Wrong password" };
+    }
+  } catch (err) {
+    console.error("Login error:", err);
+    return { success: false, message: "Server error" };
+  }
+});
+
+// App lifecycle
 app.setName("IdeaVault");
-app.whenReady().then(() => {
-  initDatabase(); // initialize DB
+app.whenReady().then(async () => {
+  await initDatabase();
   createWindow();
+});
+
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") app.quit();
 });
