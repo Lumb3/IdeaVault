@@ -39,8 +39,9 @@ function createWindow() {
     title: "IdeaVault",
     icon: path.join(__dirname, "assets", "icon.png"),
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, "preload.js"), // Loading preload.js
     },
   });
 
@@ -51,10 +52,9 @@ function createWindow() {
 ipcMain.handle("login-attempt", async (event, { username, password }) => {
   try {
     // Query user by username
-    const res = await client.query(
-      "SELECT * FROM users WHERE username = $1",
-      [username]
-    );
+    const res = await client.query("SELECT * FROM users WHERE username = $1", [
+      username,
+    ]);
 
     if (res.rows.length === 0) {
       return { success: false, message: "User not found" };
@@ -71,6 +71,25 @@ ipcMain.handle("login-attempt", async (event, { username, password }) => {
   } catch (err) {
     console.error("Login error:", err);
     return { success: false, message: "Server error" };
+  }
+});
+
+ipcMain.handle("load-notes", async () => {
+  try {
+    // Backend logic for loading notes
+
+    console.log("Loading notes...");
+  } catch (err) {
+    console.log("Error loading notes: ", err);
+    return [];
+  }
+});
+
+ipcMain.handle("save-notes", async (notes) => {
+  try {
+    // Backend logic for saving notes
+  } catch (error) {
+    console.log ("Error saving notes: ", error);
   }
 });
 
