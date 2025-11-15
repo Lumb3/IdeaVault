@@ -20,19 +20,21 @@ body {
 /* ---------- Title ---------- */
 h1 {
   font-weight: 500;
-  font-size: 1.8rem;
-  margin-bottom: 40px;
+  font-size: 2.2rem;
+  margin-bottom: 50px;
   letter-spacing: 0.5px;
   color: #3b2415;
 }
 
+
 /* ---------- Login Container ---------- */
 .border {
   background: #fff;
-  padding: 45px 50px;
+  padding: 60px 70px;       /* bigger padding = desktop feel */
   border-radius: 20px;
   box-shadow: 0 8px 35px rgba(75, 42, 17, 0.15);
-  width: 340px;
+  width: 480px;             /* desktop-friendly size */
+  max-width: 90vw;          /* prevents overflow on smaller screens */
   text-align: center;
   font-weight: 700;
   color: #7b5028;

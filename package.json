@@ -10,7 +10,11 @@
     "build:win": "electron-packager . IdeaVault --platform=win32 --arch=x64 --icon=assets/icon.ico --overwrite"
   },
   "devDependencies": {
-    "electron": "^39.1.1",
+    "electron": "^39.2.0",
     "electron-packager": "^17.1.2"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "pg": "^8.16.3"
   }
 }
