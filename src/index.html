@@ -1,57 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Notes</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+      integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
     <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h1>Notes</h1>
-                <button class="btn-new" id="newNoteBtn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                </button>
-            </div>
-            
-            <div class="search-container">
-                <input type="text" id="searchInput" placeholder="Search notes..." class="search-input">
-            </div>
-            
-            <div class="notes-list" id="notesList">
-                <!-- Notes will be populated here -->
-            </div>
-        </aside>
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h1>Notes</h1>
+          <button class="btn-new" id="newNoteBtn">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+        </div>
 
-        <!-- Main Editor -->
-        <main class="editor-container">
-            <div class="editor-header">
-                <input type="text" id="noteTitle" class="note-title" placeholder="Untitled">
-                <div class="editor-actions">
-                    <button class="btn-icon" id="deleteBtn" title="Delete note">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-            
-            <textarea id="noteContent" class="note-content" placeholder="Start writing..."></textarea>
-            
-            <div class="editor-footer">
-                <span class="word-count" id="wordCount">0 words</span>
-                <span class="last-saved" id="lastSaved"></span>
-            </div>
-        </main>
+        <div class="search-container">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Search notes..."
+            class="search-input"
+          />
+        </div>
+
+        <div class="notes-list" id="notesList">
+          <!-- Notes will be populated here -->
+        </div>
+      </aside>
+
+      <!-- Main Editor -->
+      <main class="editor-container">
+        <div class="editor-header">
+          <input
+            type="text"
+            id="noteTitle"
+            class="note-title"
+            placeholder="Untitled"
+          />
+         <div class="editor-actions">
+     <!-- Reset button added before the delete button -->
+        <button class="reset-btn" title="Reset note">
+        <i class="fa-solid fa-power-off" style="color: #d9985b"></i>
+         </button>
+
+        <button class="btn-icon" id="deleteBtn" title="Delete note">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+           </svg>
+       </button>
     </div>
 
+        </div>
+
+        <textarea
+          id="noteContent"
+          class="note-content"
+          placeholder="Start writing..."
+        ></textarea>
+
+        <div class="editor-footer">
+          <span class="word-count" id="wordCount">0 words</span>
+          <span class="last-saved" id="lastSaved"></span>
+        </div>
+      </main>
+
     <script src="renderer.js"></script>
-</body>
+  </body>
 </html>

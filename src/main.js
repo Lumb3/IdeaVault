@@ -16,7 +16,7 @@ const client = new Client({
 // Initialize database and ensure users table exists
 async function initDatabase() {
   try {
-    await client.connect();
+    await client.connect(); // Initialize a connection with the client
     const query = `
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -29,23 +29,6 @@ async function initDatabase() {
   } catch (err) {
     console.error("Error initializing database:", err);
   }
-}
-
-// Create Electron window
-function createWindow() {
-  const win = new BrowserWindow({
-    width: 900,
-    height: 650,
-    title: "IdeaVault",
-    icon: path.join(__dirname, "assets", "icon.png"),
-    webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
-      preload: path.join(__dirname, "preload.js"), // Loading preload.js
-    },
-  });
-
-  win.loadFile(path.join(__dirname, "login.html"));
 }
 
 // Handle login attempt from renderer
@@ -89,17 +72,42 @@ ipcMain.handle("save-notes", async (notes) => {
   try {
     // Backend logic for saving notes
   } catch (error) {
-    console.log ("Error saving notes: ", error);
+    console.log("Error saving notes: ", error);
   }
 });
+
+// Create Electron window
+function createWindow() {
+  const win = new BrowserWindow({
+    width: 900,
+    height: 650,
+    title: "IdeaVault",
+    icon: path.join(__dirname, "assets", "icon.png"),
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, "preload.js"), // Loading preload.js
+    },
+  });
+
+  win.loadFile(path.join(__dirname, "login.html"));
+}
 
 // App lifecycle
 app.setName("IdeaVault");
 app.whenReady().then(async () => {
   await initDatabase();
-  createWindow();
+  createWindow(); 
 });
 
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") app.quit();
+  if (process.platform !== "darwin") {
+    client
+      .end()
+      .then(() => console.log("Database connection lost."))
+      .catch((error) =>
+        console.log("Error closing database connection: ", error)
+      );
+    app.quit();
+  }
 });

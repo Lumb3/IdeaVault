@@ -1,259 +1,336 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 :root {
-    --bg-primary: #f7efd2;        /* warm beige base */
-    --bg-secondary: #f3e9c8;      /* slightly deeper tone for sidebar */
-    --bg-hover: #efe2b8;          /* hover effect with warmth */
-    --text-primary: #2a2a2a;      /* dark gray text, soft contrast */
-    --text-secondary: #5c5c5c;    
-    --text-muted: #8a8a8a;
-    --border-color: #e0d6b8;      /* light beige border */
-    --accent-color: #b88b4a;      /* warm gold accent */
-    --accent-hover: #a07235;      /* darker hover gold */
-    --shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  --bg-primary: #f7efd2; /* warm beige base */
+  --bg-secondary: #f3e9c8; /* slightly deeper tone for sidebar */
+  --bg-hover: #efe2b8; /* hover effect with warmth */
+  --text-primary: #2a2a2a; /* dark gray text, soft contrast */
+  --text-secondary: #5c5c5c;
+  --text-muted: #8a8a8a;
+  --border-color: #e0d6b8; /* light beige border */
+  --accent-color: #b88b4a; /* warm gold accent */
+  --accent-hover: #a07235; /* darker hover gold */
+  --shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
-
 body {
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    color: var(--text-primary);
-    background: var(--bg-primary);
-    overflow: hidden;
-    -webkit-font-smoothing: antialiased;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 .app-container {
-    display: flex;
-    height: 100vh;
+  display: flex;
+  height: 100vh;
 }
 
 /* Sidebar */
 .sidebar {
-    width: 280px;
-    background: var(--bg-secondary);
-    border-right: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
+  width: 280px;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar-header {
-    padding: 24px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--border-color);
+  padding: 24px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .sidebar-header h1 {
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--text-primary);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 .btn-new {
-    width: 36px;
-    height: 36px;
-    border: none;
-    background: var(--accent-color);
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: var(--accent-color);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
 }
 
 .btn-new:hover {
-    background: var(--accent-hover);
+  background: var(--accent-hover);
 }
 
 .search-container {
-    padding: 16px 20px;
+  padding: 16px 20px;
 }
 
 .search-input {
-    width: 100%;
-    padding: 10px 14px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 14px;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    transition: border-color 0.2s;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 14px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color 0.2s;
 }
 
 .search-input:focus {
-    outline: none;
-    border-color: var(--accent-color);
+  outline: none;
+  border-color: var(--accent-color);
 }
 
 .notes-list {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px;
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
 }
 
 .note-item {
-    padding: 14px 16px;
-    margin-bottom: 4px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.2s;
+  padding: 14px 16px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
 .note-item:hover {
-    background: var(--bg-hover);
+  background: var(--bg-hover);
 }
 
 .note-item.active {
-    background: var(--bg-primary);
-    box-shadow: var(--shadow);
+  background: var(--bg-primary);
+  box-shadow: var(--shadow);
 }
 
 .note-item-title {
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--text-primary);
-    margin-bottom: 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .note-item-preview {
-    font-size: 13px;
-    color: var(--text-secondary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  font-size: 13px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .note-item-date {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
 }
 
 /* Editor */
 .editor-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background: var(--bg-primary);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
 }
 
 .editor-header {
-    padding: 24px 40px;
-    border-bottom: 1px solid var(--border-color);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  padding: 24px 40px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .note-title {
-    font-size: 28px;
-    font-weight: 600;
-    border: none;
-    background: transparent;
-    color: var(--text-primary);
-    flex: 1;
-    outline: none;
+  font-size: 28px;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  flex: 1;
+  outline: none;
 }
 
 .note-title::placeholder {
-    color: var(--text-muted);
+  color: var(--text-muted);
 }
 
 .editor-actions {
-    display: flex;
-    gap: 8px;
+  display: flex;
+  gap: 8px;
 }
 
 .btn-icon {
-    width: 36px;
-    height: 36px;
-    border: none;
-    background: transparent;
-    color: var(--text-secondary);
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
 }
 
 .btn-icon:hover {
-    background: var(--bg-secondary);
-    color: var(--text-primary);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .note-content {
-    flex: 1;
-    padding: 32px 40px;
-    border: none;
-    font-size: 16px;
-    line-height: 1.7;
-    color: var(--text-primary);
-    resize: none;
-    outline: none;
-    font-family: inherit;
+  flex: 1;
+  padding: 32px 40px;
+  border: none;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--text-primary);
+  resize: none;
+  outline: none;
+  font-family: inherit;
 }
 
 .note-content::placeholder {
-    color: var(--text-muted);
+  color: var(--text-muted);
 }
 
 .editor-footer {
-    padding: 16px 40px;
-    border-top: 1px solid var(--border-color);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 13px;
-    color: var(--text-muted);
+  padding: 16px 40px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: var(--text-muted);
 }
 
 /* Scrollbar */
 .notes-list::-webkit-scrollbar,
 .note-content::-webkit-scrollbar {
-    width: 8px;
+  width: 8px;
 }
 
 .notes-list::-webkit-scrollbar-track,
 .note-content::-webkit-scrollbar-track {
-    background: transparent;
+  background: transparent;
 }
 
 .notes-list::-webkit-scrollbar-thumb,
 .note-content::-webkit-scrollbar-thumb {
-    background: var(--border-color);
-    border-radius: 4px;
+  background: var(--border-color);
+  border-radius: 4px;
 }
 
 .notes-list::-webkit-scrollbar-thumb:hover,
 .note-content::-webkit-scrollbar-thumb:hover {
-    background: var(--text-muted);
+  background: var(--text-muted);
 }
 
 /* Empty state */
 .empty-state {
-    padding: 40px;
-    text-align: center;
-    color: var(--text-muted);
+  padding: 40px;
+  text-align: center;
+  color: var(--text-muted);
 }
 
 .empty-state h2 {
-    font-size: 20px;
-    margin-bottom: 8px;
-    color: var(--text-secondary);
+  font-size: 20px;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
 }
 
 .empty-state p {
-    font-size: 14px;
+  font-size: 14px;
+}
+
+/* Editor Actions (Now with Reset Button on the Left of Delete) */
+.editor-actions {
+    display: flex;
+    gap: 8px;                     /* Space between buttons */
+    justify-content: flex-start;  /* Align buttons to the left */
+}
+
+.reset-btn {
+    width: 40px;                  /* Adjust width to match the delete button */
+    height: 40px;
+    background-color: var(--bg-primary);
+    color: var(--accent-color);
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.reset-btn:hover {
+    background-color: var(--bg-hover);
+    transform: scale(1.05);
+}
+
+.reset-btn:active {
+    background-color: var(--bg-secondary);
+    transform: scale(0.98);
+}
+
+.reset-btn i {
+    font-size: 22px;
+    color: var(--accent-color);
+    transition: color 0.2s;
+}
+
+.reset-btn:hover i {
+    color: white;
+}
+
+/* Delete Button */
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    background-color: var(--bg-primary);
+    color: var(--accent-color);
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-icon:hover {
+    background-color: var(--bg-hover);
+    transform: scale(1.05);
+}
+
+.btn-icon:active {
+    background-color: var(--bg-secondary);
+    transform: scale(0.98);
+}
+
+.btn-icon i {
+    font-size: 22px;
+    color: var(--accent-color);
+    transition: color 0.2s;
+}
+
+.btn-icon:hover i {
+    color: white;
 }

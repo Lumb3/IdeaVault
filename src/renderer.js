@@ -7,7 +7,7 @@ const noteContent = document.getElementById("noteContent");
 const searchInput = document.getElementById("searchInput");
 const wordCount = document.getElementById("wordCount");
 const lastSaved = document.getElementById("lastSaved");
-
+const reset = document.getElementsByClassName("reset-btn");
 // State
 let notes = [];
 let currentNoteId = null;
