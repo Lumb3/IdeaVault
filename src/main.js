@@ -76,6 +76,10 @@ ipcMain.handle("save-notes", async (notes) => {
   }
 });
 
+ipcMain.handle("quit-app", async() => {
+  app.quit();
+})
+
 // Create Electron window
 function createWindow() {
   const win = new BrowserWindow({

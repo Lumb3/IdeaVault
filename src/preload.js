@@ -30,5 +30,8 @@ contextBridge.exposeInMainWorld('authAPI', {
       console.error('Error saving notes:', error);
       throw error;
     }
+  },
+  quit: () => {
+    ipcRenderer.invoke("quit-app");
   }
 });

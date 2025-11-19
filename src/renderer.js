@@ -7,7 +7,7 @@ const noteContent = document.getElementById("noteContent");
 const searchInput = document.getElementById("searchInput");
 const wordCount = document.getElementById("wordCount");
 const lastSaved = document.getElementById("lastSaved");
-const reset = document.getElementsByClassName("reset-btn");
+
 // State
 let notes = [];
 let currentNoteId = null;
@@ -26,8 +26,20 @@ function setupEventListeners() {
   noteTitle.addEventListener("input", handleNoteEdit);
   noteContent.addEventListener("input", handleNoteEdit);
   searchInput.addEventListener("input", handleSearch);
-
   noteContent.addEventListener("input", updateWordCount);
+  document.querySelectorAll(".reset-btn").forEach((btn) => {
+    btn.addEventListener("click", exit);
+  });
+}
+
+// Save and exit
+async function exit() {
+  try {
+    await saveNotes();
+    window.authAPI.quit();
+  } catch (e) {
+    console.log ("Error in quitting: ", e);
+  }
 }
 
 // Load Notes from Storage
