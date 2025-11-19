@@ -22,10 +22,10 @@ contextBridge.exposeInMainWorld('authAPI', {
       throw error;
     }
   },
-  save: async (notes, userId) => {
+  save: async (notes) => {
     try {
       // Send a message to the main process to save notes
-      return await ipcRenderer.invoke('save-notes', notes, userId);
+      return await ipcRenderer.invoke('save-notes', notes);
     } catch (error) {
       console.error('Error saving notes:', error);
       throw error;

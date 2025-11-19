@@ -24,13 +24,13 @@ async function initDatabase() {
         password VARCHAR(255) NOT NULL
       );
 
-      CREATE TABLE IF NOT EXISTS notes (
-        id SERIAL PRIMARY KEY,
-        title VARCHAR(255) NOT NULL,  -- Note title
-        content TEXT,                 -- Note content
-        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-        updated_at TIMESTAMP NOT NULL DEFAULT NOW()
-      );
+    CREATE TABLE IF NOT EXISTS notes (
+    id VARCHAR(20) PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
     `;
     await client.query(query);
     console.log("Database initialized and tables ready!");
@@ -71,29 +71,35 @@ ipcMain.handle("load-notes", async () => {
     const res = await client.query(
       "SELECT * FROM notes ORDER BY updated_at DESC"
     ); // get the result by the updated_at column, from newest to oldest
+    console.log ("Successfully loaded the notes");
     return res.rows; // returns the newest data
-  } catch (err) {
-    console.log("Error loading notes: ", err);
+  } catch (error) {
+    console.log("Error loading notes: ", error);
     return [];
   }
 });
 
-ipcMain.handle("save-notes", async (notes, userId) => {
-  try {
-    // Backend logic for saving notes
-    for (const note of notes) {
-      await client.query(
-        `INSERT INTO notes (id, title, content, created_at, updated_at)
-        VALUES ($1, $2, $3, $4, $5)
-        ON CONFLICT (id) DO UPDATE
-        SET title = $2, content = $3, updated_at = $5`,
-        [note.id, note.title, note.content, note.createdAt, note.updatedAt]
-      );
-    }
-  } catch (error) {
-    console.log("Error saving notes: ", error);
-  }
-});
+// Slow save-notes
+// ipcMain.handle("save-notes", async (event, notes) => {
+//   if (!Array.isArray(notes)) {
+//     console.error("Expected notes array but got:", notes);
+//     return;
+//   }
+
+//   try {
+//     for (const note of notes) {
+//       await client.query(
+//         `INSERT INTO notes (id, title, content, created_at, updated_at)
+//          VALUES ($1, $2, $3, $4, $5)
+//          ON CONFLICT (id) DO UPDATE
+//          SET title = $2, content = $3, updated_at = $5`,
+//         [note.id, note.title, note.content, note.createdAt, note.updatedAt]
+//       );
+//     }
+//   } catch (err) {
+//     console.error("Error saving notes:", err);
+//   }
+// });
 
 ipcMain.handle("quit-app", async () => {
   app.quit();

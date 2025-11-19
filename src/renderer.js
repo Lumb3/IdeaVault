@@ -43,7 +43,7 @@ async function exit() {
 // Load Notes from Storage
 async function loadNotes() {
   try {
-    const data = await window.authAPI.load(notes);
+    const data = await window.authAPI.load();
     notes = data || [];
     renderNotesList();
     if (notes.length > 0) {
@@ -58,7 +58,7 @@ async function loadNotes() {
 // Save Notes to Storage
 async function saveNotes() {
   try {
-    await window.authAPI.save(notes, userId);
+    await window.authAPI.save(notes);
     updateLastSaved();
   } catch (error) {
     console.error("Failed to save notes:", error);
