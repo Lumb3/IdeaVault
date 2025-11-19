@@ -23,9 +23,17 @@ async function initDatabase() {
         username VARCHAR(50) UNIQUE NOT NULL,
         password VARCHAR(255) NOT NULL
       );
+
+      CREATE TABLE IF NOT EXISTS notes (
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,  -- Note title
+        content TEXT,                 -- Note content
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+      );
     `;
     await client.query(query);
-    console.log("Database initialized and users table ready!");
+    console.log("Database initialized and tables ready!");
   } catch (err) {
     console.error("Error initializing database:", err);
   }
@@ -60,25 +68,36 @@ ipcMain.handle("login-attempt", async (event, { username, password }) => {
 ipcMain.handle("load-notes", async () => {
   try {
     // Backend logic for loading notes
-
-    console.log("Loading notes...");
+    const res = await client.query(
+      "SELECT * FROM notes ORDER BY updated_at DESC"
+    ); // get the result by the updated_at column, from newest to oldest
+    return res.rows; // returns the newest data
   } catch (err) {
     console.log("Error loading notes: ", err);
     return [];
   }
 });
 
-ipcMain.handle("save-notes", async (notes) => {
+ipcMain.handle("save-notes", async (notes, userId) => {
   try {
     // Backend logic for saving notes
+    for (const note of notes) {
+      await client.query(
+        `INSERT INTO notes (id, title, content, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5)
+        ON CONFLICT (id) DO UPDATE
+        SET title = $2, content = $3, updated_at = $5`,
+        [note.id, note.title, note.content, note.createdAt, note.updatedAt]
+      );
+    }
   } catch (error) {
     console.log("Error saving notes: ", error);
   }
 });
 
-ipcMain.handle("quit-app", async() => {
+ipcMain.handle("quit-app", async () => {
   app.quit();
-})
+});
 
 // Create Electron window
 function createWindow() {
@@ -101,7 +120,7 @@ function createWindow() {
 app.setName("IdeaVault");
 app.whenReady().then(async () => {
   await initDatabase();
-  createWindow(); 
+  createWindow();
 });
 
 app.on("window-all-closed", () => {

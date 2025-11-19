@@ -27,9 +27,7 @@ function setupEventListeners() {
   noteContent.addEventListener("input", handleNoteEdit);
   searchInput.addEventListener("input", handleSearch);
   noteContent.addEventListener("input", updateWordCount);
-  document.querySelectorAll(".reset-btn").forEach((btn) => {
-    btn.addEventListener("click", exit);
-  });
+  document.querySelector(".reset-btn").addEventListener("click", exit);
 }
 
 // Save and exit
@@ -45,7 +43,7 @@ async function exit() {
 // Load Notes from Storage
 async function loadNotes() {
   try {
-    const data = await window.authAPI.load();
+    const data = await window.authAPI.load(notes);
     notes = data || [];
     renderNotesList();
     if (notes.length > 0) {
@@ -60,7 +58,7 @@ async function loadNotes() {
 // Save Notes to Storage
 async function saveNotes() {
   try {
-    await window.authAPI.save(notes);
+    await window.authAPI.save(notes, userId);
     updateLastSaved();
   } catch (error) {
     console.error("Failed to save notes:", error);
