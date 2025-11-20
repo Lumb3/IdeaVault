@@ -2,21 +2,23 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const bcrypt = require("bcryptjs");
-const { Client } = require("pg");
+const { Pool } = require("pg");
 
 // PostgreSQL client setup
-const client = new Client({
+const pool = new Pool({
   user: "eric", // your DB user
   host: "localhost",
   database: "my_database",
   password: "", // add DB password if needed
   port: 5432,
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
 });
 
 // Initialize database and ensure users table exists
 async function initDatabase() {
   try {
-    await client.connect(); // Initialize a connection with the client
     const query = `
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -24,15 +26,17 @@ async function initDatabase() {
         password VARCHAR(255) NOT NULL
       );
 
-    CREATE TABLE IF NOT EXISTS notes (
-    id VARCHAR(20) PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    content TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
-    );
+      CREATE TABLE IF NOT EXISTS notes (
+        id VARCHAR(20) PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        content TEXT,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+      );
+      
+      CREATE INDEX IF NOT EXISTS idx_notes_updated_at ON notes(updated_at DESC);
     `;
-    await client.query(query);
+    await pool.query(query);
     console.log("Database initialized and tables ready!");
   } catch (err) {
     console.error("Error initializing database:", err);
@@ -43,7 +47,7 @@ async function initDatabase() {
 ipcMain.handle("login-attempt", async (event, { username, password }) => {
   try {
     // Query user by username
-    const res = await client.query("SELECT * FROM users WHERE username = $1", [
+    const res = await pool.query("SELECT * FROM users WHERE username = $1", [
       username,
     ]);
 
@@ -67,39 +71,86 @@ ipcMain.handle("login-attempt", async (event, { username, password }) => {
 
 ipcMain.handle("load-notes", async () => {
   try {
-    // Backend logic for loading notes
-    const res = await client.query(
+    const res = await pool.query(
       "SELECT * FROM notes ORDER BY updated_at DESC"
-    ); // get the result by the updated_at column, from newest to oldest
-    console.log ("Successfully loaded the notes");
-    return res.rows; // returns the newest data
+    );
+    console.log("Successfully loaded the notes");
+
+    // Map database columns to camelCase for JavaScript
+    return res.rows.map((note) => ({
+      id: note.id,
+      title: note.title,
+      content: note.content,
+      createdAt: note.created_at,
+      updatedAt: note.updated_at,
+    }));
   } catch (error) {
     console.log("Error loading notes: ", error);
     return [];
   }
 });
 
-// Slow save-notes
-// ipcMain.handle("save-notes", async (event, notes) => {
-//   if (!Array.isArray(notes)) {
-//     console.error("Expected notes array but got:", notes);
-//     return;
-//   }
+ipcMain.handle("save-notes", async (event, notes) => {
+  if (!Array.isArray(notes) || notes.length === 0) {
+    return;
+  }
 
-//   try {
-//     for (const note of notes) {
-//       await client.query(
-//         `INSERT INTO notes (id, title, content, created_at, updated_at)
-//          VALUES ($1, $2, $3, $4, $5)
-//          ON CONFLICT (id) DO UPDATE
-//          SET title = $2, content = $3, updated_at = $5`,
-//         [note.id, note.title, note.content, note.createdAt, note.updatedAt]
-//       );
-//     }
-//   } catch (err) {
-//     console.error("Error saving notes:", err);
-//   }
-// });
+  const client = await pool.connect(); // Use connection pool
+
+  try {
+    await client.query("BEGIN"); // Start transaction
+
+    // Build batch query with multiple value sets
+    const values = [];
+    const placeholders = [];
+
+    notes.forEach((note, index) => {
+      const offset = index * 5;
+      placeholders.push(
+        `($${offset + 1}, $${offset + 2}, $${offset + 3}, $${offset + 4}, $${
+          offset + 5
+        })`
+      );
+      values.push(
+        note.id,
+        note.title,
+        note.content,
+        note.createdAt,
+        note.updatedAt
+      );
+    });
+
+    const query = `
+      INSERT INTO notes (id, title, content, created_at, updated_at)
+      VALUES ${placeholders.join(", ")}
+      ON CONFLICT (id) DO UPDATE
+      SET title = EXCLUDED.title,
+          content = EXCLUDED.content,
+          updated_at = EXCLUDED.updated_at
+    `;
+
+    await client.query(query, values);
+    await client.query("COMMIT");
+
+    console.log(`Successfully saved ${notes.length} notes`);
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error("Error saving notes:", err);
+    throw err;
+  } finally {
+    client.release();
+  }
+});
+
+ipcMain.handle("delete-note", async (event, noteId) => {
+  try {
+    await pool.query("DELETE FROM notes WHERE id = $1", [noteId]);
+    console.log(`Successfully deleted note ${noteId}`);
+  } catch (err) {
+    console.error("Error deleting note:", err);
+    throw err;
+  }
+});
 
 ipcMain.handle("quit-app", async () => {
   app.quit();
@@ -131,7 +182,7 @@ app.whenReady().then(async () => {
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
-    client
+    pool
       .end()
       .then(() => console.log("Database connection lost."))
       .catch((error) =>

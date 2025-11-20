@@ -1,4 +1,4 @@
-// DOM Elements
+// renderer.js
 const newNoteBtn = document.getElementById("newNoteBtn");
 const deleteBtn = document.getElementById("deleteBtn");
 const notesList = document.getElementById("notesList");
@@ -36,7 +36,7 @@ async function exit() {
     await saveNotes();
     window.authAPI.quit();
   } catch (e) {
-    console.log ("Error in quitting: ", e);
+    console.log("Error in quitting: ", e);
   }
 }
 
@@ -67,6 +67,7 @@ async function saveNotes() {
 
 // Create New Note
 function createNewNote() {
+  clearTimeout(saveTimeout);
   const newNote = {
     id: Date.now().toString(),
     title: "Untitled",
@@ -84,22 +85,27 @@ function createNewNote() {
 }
 
 // Delete Current Note
-function deleteCurrentNote() {
+async function deleteCurrentNote() {
   if (!currentNoteId) return;
 
   const index = notes.findIndex((n) => n.id === currentNoteId);
   if (index === -1) return;
 
-  notes.splice(index, 1);
-  renderNotesList();
+  // Clear any pending saves
+  clearTimeout(saveTimeout);
 
-  if (notes.length > 0) {
-    selectNote(notes[0].id);
-  } else {
-    clearEditor();
+  try {
+    await window.authAPI.delete(currentNoteId);
+    notes.splice(index, 1);
+    renderNotesList();
+    if (notes.length > 0) {
+      selectNote(notes[0].id);
+    } else {
+      clearEditor();
+    }
+  } catch (error) {
+    console.error("Failed to delete note: ", error);
   }
-
-  saveNotes();
 }
 
 // Select Note
