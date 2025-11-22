@@ -12,10 +12,11 @@
   },
   "devDependencies": {
     "electron": "^39.2.0",
-    "electron-packager": "^17.1.2",
-    "electron-builder": "^26.0.12"
+    "electron-builder": "^26.0.12",
+    "electron-packager": "^17.1.2"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.84.0",
     "bcryptjs": "^3.0.3",
     "pg": "^8.16.3"
   },
@@ -23,11 +24,17 @@
     "appId": "com.erik.ideavault",
     "productName": "IdeaVault",
     "mac": {
-      "target": ["dmg", "zip"],
+      "target": [
+        "dmg",
+        "zip"
+      ],
       "icon": "/Users/erkhembilegariunbold/Desktop/IdeaVault/assets/icon.icns"
     },
     "win": {
-      "target": ["nsis", "zip"],
+      "target": [
+        "nsis",
+        "zip"
+      ],
       "icon": "assets/icon.ico"
     }
   }
