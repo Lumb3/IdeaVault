@@ -4,7 +4,7 @@ const path = require("path");
 const bcrypt = require("bcryptjs");
 const { Pool } = require("pg");
 
-// PostgreSQL client setup
+// PostgreSQL pool (for interaction with tables) setup
 const pool = new Pool({
   user: "eric", // your DB user
   host: "localhost",
@@ -91,7 +91,7 @@ ipcMain.handle("load-notes", async () => {
 });
 
 ipcMain.handle("save-notes", async (event, notes) => {
-  if (!Array.isArray(notes) || notes.length === 0) {
+  if (!Array.isArray(notes) || notes.length === 0) { // if the data is not in array format
     return;
   }
 
@@ -138,7 +138,7 @@ ipcMain.handle("save-notes", async (event, notes) => {
     console.error("Error saving notes:", err);
     throw err;
   } finally {
-    client.release();
+    client.release();  // releases the database connection
   }
 });
 

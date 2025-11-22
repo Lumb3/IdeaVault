@@ -43,7 +43,7 @@ async function exit() {
 // Load Notes from Storage
 async function loadNotes() {
   try {
-    const data = await window.authAPI.load();
+    const data = await window.authAPI.load(); // returns array of dataf
     notes = data || [];
     renderNotesList();
     if (notes.length > 0) {
