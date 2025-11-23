@@ -44,7 +44,7 @@ Electron.js • PostgreSQL • bcrypt.js • Node.js
 
 <p align="center">
   <img src="imgs/login.png" width="500" alt="Login Page">
-  <img src="imgs/main.png" width="500" alt="Main Page">
+  <img src="imgs/example.png" width="500" alt="Main Page">
 </p>
 
 ---
