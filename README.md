@@ -1,7 +1,7 @@
 # 💡 IdeaVault
 
-A secure desktop note-taking application for organizing school notes and personal information.
-
+Welcome to **IdeaVault v1.0.0**!  
+IdeaVault is a simple, user-friendly desktop application designed for organizing school notes and securely storing personal information. While the first deployment is intended for my personal use, future releases will support more users.
 ---
 
 ## ✨ Features
@@ -44,6 +44,7 @@ Electron.js • PostgreSQL • bcrypt.js • Node.js
 
 <p align="center">
   <img src="imgs/login.png" width="500" alt="Login Page">
+  <img src="imgs/incorrect.png" width="500" alt="Wrong Password">
   <img src="imgs/example.png" width="500" alt="Main Page">
 </p>
 
