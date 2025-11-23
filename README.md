@@ -34,7 +34,7 @@ IdeaVault is a simple, user-friendly desktop application designed for organizing
 ### Download and Install
 
 1. Navigate to the [Releases](https://github.com/Lumb3/IdeaVault/releases/tag/v1.0.0) page
-2. Download **v1.0.0** → `dist.zip`
+2. Download **v1.0.0** → `IdeaVault.zip`
 3. Extract the zip file
 4. Open the `mac-arm64` folder
 5. Double-click the **IdeaVault** application to launch
@@ -126,14 +126,6 @@ This is the first release of IdeaVault and currently supports only a private use
 - 🌙 Dark mode support
 - 📤 Export notes to PDF/Markdown
 - 🔔 Reminder and notification system
-
----
-
-## 📧 Contact
-
-For questions, feedback, or support, feel free to reach out:
-- GitHub: [@Lumb3](https://github.com/Lumb3)
-- Open an [issue](https://github.com/Lumb3/IdeaVault/issues) for bug reports or feature requests
 
 ---
 
