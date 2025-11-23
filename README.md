@@ -1,135 +1,72 @@
-# 💡 IdeaVault — A Secure Note-Taking Desktop Application
+# 💡 IdeaVault
 
-Welcome to **IdeaVault v1.0.0**!  
-IdeaVault is a simple, user-friendly desktop application designed for organizing school notes and securely storing personal information. While the first deployment is intended for my personal use, future releases will support more users.
+A secure desktop note-taking application for organizing school notes and personal information.
 
 ---
 
 ## ✨ Features
 
-- **Secure Login** — The login password is safely stored using bcrypt hashing.
-- **Note-Taking** — Create and organize notes for classes, projects, or personal use.
-- **Remote Database** — All data is stored in a remote PostgreSQL database.
-- **Auto-Save** — Notes are automatically saved to prevent data loss.
-- **Cross-Platform** — Built with Electron.js for compatibility across macOS, Windows, and Linux.
+- **Secure Login** with bcrypt password hashing
+- **Auto-Save** to prevent data loss
+- **Remote Database** (PostgreSQL)
+- **Cross-Platform** (macOS, Windows, Linux)
 
 ---
 
-## 🛠️ Technologies Used
+## 🛠️ Tech Stack
 
-- **Electron.js** — Framework for building cross-platform desktop apps using HTML, CSS, and JavaScript. (*Font Awesome is used for icon selection.*)
-- **PostgreSQL** — Open-source relational database for secure data storage.
-- **bcrypt.js** — Used for password hashing and authentication security.
-- **Node.js** — Backend runtime environment.
+Electron.js • PostgreSQL • bcrypt.js • Node.js
 
 ---
 
 ## 📦 Installation
 
-### Prerequisites
+**Requirements:** macOS (ARM64), Internet connection
 
-- macOS (ARM64 architecture for v1.0.0)
-- Internet connection for database access
+1. Download **v1.0.0** from [Releases](https://github.com/Lumb3/IdeaVault/releases/tag/v1.0.0)
+2. Extract `IdeaVault.zip` and open the `mac-arm64` folder
+3. Double-click **IdeaVault** to launch
 
-### Download and Install
-
-1. Navigate to the [Releases](https://github.com/Lumb3/IdeaVault/releases/tag/v1.0.0) page
-2. Download **v1.0.0** → `IdeaVault.zip`
-3. Extract the zip file
-4. Open the `mac-arm64` folder
-5. Double-click the **IdeaVault** application to launch
-
-> **Note:** For first-time users on macOS, you may need to right-click the app and select "Open" to bypass Gatekeeper security.
+> **macOS Note:** First-time users may need to right-click → "Open" to bypass Gatekeeper.
 
 ---
 
 ## 🚀 Quick Start
 
-1. **Launch the Application** — Open IdeaVault from your Applications folder
-2. **Login** — Enter your credentials (default username and password provided separately)
-3. **Create Notes** — Click the "+" button to add a new note
-4. **Save Your Work** — Use Cmd+S or click the save button
-5. **Exit Safely** — Always use the exit button to ensure data is saved
+1. Launch the app and login with provided credentials
+2. Click "+" to create notes
+3. Save with Cmd+S or the save button
+4. Always use the exit button to ensure data is saved
 
 ---
 
 ## 🔍 Preview
 
-### Application icon
-
 <p align="center">
-  <img src="imgs/icon.png" width="300" alt="IdeaVault Icon">
-</p>
-
-### Login page
-
-<p align="center">
-  <img src="imgs/login.png" width="600" alt="Login Page">
-</p>
-
-### Incorrect password
-
-<p align="center">
-  <img src="imgs/incorrect.png" width="600" alt="Incorrect Password">
-</p>
-
-Once the username and password match the hashed credentials stored in the PostgreSQL database, access to the main page is granted:
-
-### Main page
-
-<p align="center">
-  <img src="imgs/main.png" width="600" alt="Main Page">
-</p>
-
-From here, notes can be added, deleted, saved, and safely exited using the toolbar buttons.
-
-### Example usage
-
-<p align="center">
-  <img src="imgs/example.png" width="600" alt="Example Usage">
+  <img src="imgs/login.png" width="500" alt="Login Page">
+  <img src="imgs/main.png" width="500" alt="Main Page">
 </p>
 
 ---
 
-## 🔐 Security
+## 🚀 Planned Features
 
-- **Password Protection** — All passwords are hashed using bcrypt before storage
-- **Secure Connection** — Data transmitted to PostgreSQL database over secure connections
-- **No Local Storage** — Sensitive data is never stored locally in plain text
-
----
-
-## 🤝 Contributing
-
-This project is currently in development and not open for contributions. However, feedback and suggestions are always welcome!
-
-If you encounter any issues or have feature requests, please open an issue on the [GitHub repository](https://github.com/Lumb3/IdeaVault/issues).
+- Multi-user support with Supabase authentication
+- Note tagging and search functionality
+- Mobile companion app
+- Dark mode
+- Export to PDF/Markdown
+- Reminders and notifications
 
 ---
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🚀 Future Plans
-
-This is the first release of IdeaVault and currently supports only a private user.
-
-**Planned Features:**
-- 🔄 Multi-user support with individual accounts
-- 🌐 Migration to Supabase for scalable authentication
-- 🏷️ Note tagging and categorization system
-- 🔍 Advanced search functionality
-- 📱 Mobile companion app (iOS/Android)
-- 🌙 Dark mode support
-- 📤 Export notes to PDF/Markdown
-- 🔔 Reminder and notification system
+MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
 <p align="center">Made with ❤️ by Lumb333</p>
 <p align="center">
-  <a href="https://github.com/Lumb3/IdeaVault">⭐ Star this repository if you find it helpful!</a>
+  <a href="https://github.com/Lumb3/IdeaVault">⭐ Star this repository!</a>
 </p>
