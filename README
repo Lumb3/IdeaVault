@@ -31,19 +31,19 @@ To view the first release:
 
 Inside `dist.zip`, open the `mac-arm64` folder to access the application.
 
-**Application icon**
+### Application icon
 
 <p align="center">
   <img src="imgs/icon.png" width="300" alt="IdeaVault Icon">
 </p>
 
-**Login page**
+### Login page
 
 <p align="center">
   <img src="imgs/login.png" width="600" alt="Login Page">
 </p>
 
-**Incorrect password**
+### Incorrect password
 
 <p align="center">
   <img src="imgs/incorrect.png" width="600" alt="Incorrect Password">
@@ -51,7 +51,7 @@ Inside `dist.zip`, open the `mac-arm64` folder to access the application.
 
 Once the username and password match the hashed credentials stored in the PostgreSQL database, access to the main page is granted:
 
-**Main page**
+### Main page
 
 <p align="center">
   <img src="imgs/main.png" width="600" alt="Main Page">
@@ -59,7 +59,7 @@ Once the username and password match the hashed credentials stored in the Postgr
 
 From here, notes can be added, deleted, saved, and safely exited using the toolbar buttons.
 
-**Example usage**
+### Example usage
 
 <p align="center">
   <img src="imgs/example.png" width="600" alt="Example Usage">
