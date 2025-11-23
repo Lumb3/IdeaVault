@@ -1,3 +1,4 @@
+/* Bright Mode - Enhanced Minimalist Design */
 * {
   margin: 0;
   padding: 0;
@@ -5,24 +6,26 @@
 }
 
 :root {
-  --bg-primary: #f7efd2; /* warm beige base */
-  --bg-secondary: #f3e9c8; /* slightly deeper tone for sidebar */
-  --bg-hover: #efe2b8; /* hover effect with warmth */
-  --text-primary: #2a2a2a; /* dark gray text, soft contrast */
-  --text-secondary: #5c5c5c;
-  --text-muted: #8a8a8a;
-  --border-color: #e0d6b8; /* light beige border */
-  --accent-color: #b88b4a; /* warm gold accent */
-  --accent-hover: #a07235; /* darker hover gold */
-  --shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  --bg-primary: #fafaf8;
+  --bg-secondary: #f5f5f0;
+  --bg-hover: #eeeedb;
+  --text-primary: #2c2c2c;
+  --text-secondary: #606060;
+  --text-muted: #999999;
+  --border-color: #e5e5dd;
+  --accent-color: #c9a365;
+  --accent-hover: #b8924d;
+  --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-medium: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 body {
-  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   color: var(--text-primary);
   background: var(--bg-primary);
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .app-container {
@@ -48,9 +51,10 @@ body {
 }
 
 .sidebar-header h1 {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
   color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
 .btn-new {
@@ -59,16 +63,23 @@ body {
   border: none;
   background: var(--accent-color);
   color: white;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-light);
 }
 
 .btn-new:hover {
   background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-medium);
+}
+
+.btn-new:active {
+  transform: translateY(0);
 }
 
 .search-container {
@@ -79,16 +90,21 @@ body {
   width: 100%;
   padding: 10px 14px;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14px;
   background: var(--bg-primary);
   color: var(--text-primary);
-  transition: border-color 0.2s;
+  transition: all 0.2s ease;
 }
 
 .search-input:focus {
   outline: none;
   border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(201, 163, 101, 0.1);
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
 }
 
 .notes-list {
@@ -100,18 +116,21 @@ body {
 .note-item {
   padding: 14px 16px;
   margin-bottom: 4px;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
 }
 
 .note-item:hover {
   background: var(--bg-hover);
+  border-color: var(--border-color);
 }
 
 .note-item.active {
   background: var(--bg-primary);
-  box-shadow: var(--shadow);
+  border-color: var(--accent-color);
+  box-shadow: var(--shadow-light);
 }
 
 .note-item-title {
@@ -130,6 +149,7 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.4;
 }
 
 .note-item-date {
@@ -162,6 +182,7 @@ body {
   color: var(--text-primary);
   flex: 1;
   outline: none;
+  letter-spacing: -0.02em;
 }
 
 .note-title::placeholder {
@@ -170,26 +191,47 @@ body {
 
 .editor-actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
+  align-items: center;
 }
 
+.reset-btn,
 .btn-icon {
-  width: 36px;
-  height: 36px;
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  border-radius: 8px;
-  cursor: pointer;
+  width: 38px;
+  height: 38px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
+.reset-btn:hover,
 .btn-icon:hover {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
+  background-color: var(--bg-hover);
+  border-color: var(--accent-color);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-light);
+}
+
+.reset-btn:active,
+.btn-icon:active {
+  transform: translateY(0);
+}
+
+.reset-btn i,
+.btn-icon i {
+  font-size: 18px;
+  color: var(--accent-color) !important;
+  transition: color 0.2s ease;
+}
+
+.reset-btn:hover i,
+.btn-icon:hover i {
+  color: var(--accent-hover) !important;
 }
 
 .note-content {
@@ -202,6 +244,7 @@ body {
   resize: none;
   outline: none;
   font-family: inherit;
+  background: var(--bg-primary);
 }
 
 .note-content::placeholder {
@@ -216,6 +259,69 @@ body {
   align-items: center;
   font-size: 13px;
   color: var(--text-muted);
+}
+
+/* Toggle Switch */
+.toggle-wrap {
+  width: 56px;
+  height: 32px;
+  background: var(--border-color);
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.toggle-wrap:hover {
+  background: var(--accent-color);
+}
+
+.toggle-wrap .toggle {
+  width: 26px;
+  height: 26px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  left: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+  box-shadow: var(--shadow-light);
+}
+
+.toggle-wrap .toggle i {
+  font-size: 13px;
+  position: absolute;
+  transition: opacity 0.3s ease;
+}
+
+.toggle-wrap .toggle .sun-icon {
+  color: #f39c12;
+  opacity: 1;
+}
+
+.toggle-wrap .toggle .moon-icon {
+  color: #4a5568;
+  opacity: 0;
+}
+
+.toggle-wrap.active {
+  background: var(--accent-color);
+}
+
+.toggle-wrap.active .toggle {
+  transform: translateX(24px);
+}
+
+.toggle-wrap.active .toggle .sun-icon {
+  opacity: 0;
+}
+
+.toggle-wrap.active .toggle .moon-icon {
+  opacity: 1;
 }
 
 /* Scrollbar */
@@ -233,14 +339,15 @@ body {
 .note-content::-webkit-scrollbar-thumb {
   background: var(--border-color);
   border-radius: 4px;
+  transition: background 0.2s ease;
 }
 
 .notes-list::-webkit-scrollbar-thumb:hover,
 .note-content::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+  background: var(--accent-color);
 }
 
-/* Empty state */
+/* Empty State */
 .empty-state {
   padding: 40px;
   text-align: center;
@@ -251,86 +358,20 @@ body {
   font-size: 20px;
   margin-bottom: 8px;
   color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .empty-state p {
   font-size: 14px;
 }
 
-/* Editor Actions (Now with Reset Button on the Left of Delete) */
-.editor-actions {
-    display: flex;
-    gap: 8px;                     /* Space between buttons */
-    justify-content: flex-start;  /* Align buttons to the left */
+/* Selection */
+::selection {
+  background: var(--accent-color);
+  color: white;
 }
 
-.reset-btn {
-    width: 40px;                  /* Adjust width to match the delete button */
-    height: 40px;
-    background-color: var(--bg-primary);
-    color: var(--accent-color);
-    border: 2px solid var(--border-color);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.2s;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.reset-btn:hover {
-    background-color: var(--bg-hover);
-    transform: scale(1.05);
-}
-
-.reset-btn:active {
-    background-color: var(--bg-secondary);
-    transform: scale(0.98);
-}
-
-.reset-btn i {
-    font-size: 22px;
-    color: var(--accent-color);
-    transition: color 0.2s;
-}
-
-.reset-btn:hover i {
-    color: white;
-}
-
-/* Delete Button */
-.btn-icon {
-    width: 40px;
-    height: 40px;
-    background-color: var(--bg-primary);
-    color: var(--accent-color);
-    border: 2px solid var(--border-color);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.2s;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.btn-icon:hover {
-    background-color: var(--bg-hover);
-    transform: scale(1.05);
-}
-
-.btn-icon:active {
-    background-color: var(--bg-secondary);
-    transform: scale(0.98);
-}
-
-.btn-icon i {
-    font-size: 22px;
-    color: var(--accent-color);
-    transition: color 0.2s;
-}
-
-.btn-icon:hover i {
-    color: white;
+::-moz-selection {
+  background: var(--accent-color);
+  color: white;
 }

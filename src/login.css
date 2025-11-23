@@ -3,20 +3,22 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 /* ---------- Colors & Theme Variables ---------- */
 :root {
-  --bg-primary: #f7efd2; /* warm beige background */
-  --bg-secondary: #fff;  /* login card background */
-  --bg-hover: #efe2b8;   /* subtle hover highlight */
-  --text-primary: #2a2a2a; 
-  --text-secondary: #5c5c5c;
-  --accent-color: #b88b4a; 
-  --accent-hover: #a07235; 
-  --border-color: #e0d6b8; 
-  --shadow: 0 6px 20px rgba(0,0,0,0.08);
+  --bg-primary: #fafaf8;
+  --bg-secondary: #ffffff;
+  --bg-input: #f5f5f0;
+  --text-primary: #2c2c2c;
+  --text-secondary: #606060;
+  --text-muted: #999999;
+  --accent-color: #c9a365;
+  --accent-hover: #b8924d;
+  --border-color: #e5e5dd;
+  --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 /* ---------- Page Background ---------- */
@@ -29,39 +31,42 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ---------- Page Title ---------- */
 h1 {
   font-weight: 600;
-  font-size: 2rem;
-  margin-bottom: 40px;
+  font-size: 28px;
+  margin-bottom: 32px;
   color: var(--text-primary);
   text-align: center;
+  letter-spacing: -0.02em;
 }
 
 /* ---------- Login Card ---------- */
 .border {
   background: var(--bg-secondary);
-  padding: 50px 60px;
-  border-radius: 20px;
-  box-shadow: var(--shadow);
-  width: 400px;
+  padding: 48px 40px;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-medium);
+  width: 380px;
   max-width: 90vw;
   text-align: center;
   transition: all 0.3s ease;
 }
 
 .border:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
 }
 
 .sign-in-text {
-  font-size: 1.5rem;
+  font-size: 22px;
   font-weight: 600;
-  margin-bottom: 25px;
+  margin-bottom: 28px;
   color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
 /* ---------- Input Fields ---------- */
@@ -71,98 +76,132 @@ h1 {
   align-items: center;
   gap: 12px;
   border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 12px 15px;
-  margin-top: 20px;
-  background-color: #faf7f5;
-  transition: border 0.25s ease, background 0.25s ease;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-top: 16px;
+  background-color: var(--bg-input);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.username-border:hover,
+.password-border:hover {
+  border-color: var(--accent-color);
 }
 
 .username-border:focus-within,
 .password-border:focus-within {
   border-color: var(--accent-color);
-  background-color: #fff;
+  background-color: var(--bg-secondary);
+  box-shadow: 0 0 0 3px rgba(201, 163, 101, 0.1);
 }
 
 input {
   flex: 1;
   border: none;
   outline: none;
-  font-size: 1rem;
+  font-size: 15px;
   color: var(--text-primary);
   background: transparent;
-  padding: 8px 0;
+  padding: 4px 0;
 }
 
-/* ---------- Password Toggle Icon ---------- */
-.password-border {
-  position: relative;
-}
-
-#togglePassword {
-  position: absolute;
-  right: 15px;
-  cursor: pointer;
-  font-size: 1.1rem;
-  color: var(--accent-color);
-  transition: transform 0.2s ease, opacity 0.2s ease;
-}
-
-/* ---------- Login Button ---------- */
-.login-border {
-  margin-top: 30px;
-}
-
-button {
-  width: 100%;
-  padding: 12px;
-  background-color: var(--accent-color);
-  border: none;
-  border-radius: 12px;
-  color: #fff;
-  font-size: 1rem;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  transition: background 0.25s ease, transform 0.1s ease;
-}
-
-button:hover {
-  background-color: var(--accent-hover);
-}
-
-button:active {
-  transform: scale(0.98);
+input::placeholder {
+  color: var(--text-muted);
 }
 
 /* ---------- Icon Styling ---------- */
 i {
-  font-size: 1.1rem;
-  color: var(--accent-color);
+  font-size: 16px;
+  color: var(--accent-color) !important;
+  transition: color 0.2s ease;
+}
+
+.username-border:focus-within i,
+.password-border:focus-within i {
+  color: var(--accent-hover) !important;
+}
+
+/* ---------- Password Toggle Icon ---------- */
+#togglePassword {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#togglePassword:hover {
+  transform: scale(1.1);
+  color: var(--accent-hover) !important;
+}
+
+/* ---------- Login Button ---------- */
+.login-border {
+  margin-top: 28px;
+}
+
+button {
+  width: 100%;
+  padding: 13px;
+  background-color: var(--accent-color);
+  border: none;
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-light);
+}
+
+button:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-medium);
+}
+
+button:active {
+  transform: translateY(0);
 }
 
 /* ---------- Alert Messages ---------- */
 #alert {
-  margin-top: 20px;
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
   text-align: center;
-  font-weight: bold;
-  padding: 10px;
-  border-radius: 8px;
-  width: 250px;
-  margin-left: auto;
-  margin-right: auto;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 12px 24px;
+  border-radius: 10px;
+  min-width: 280px;
+  max-width: 90vw;
   display: none;
+  animation: slideDown 0.3s ease;
+  box-shadow: var(--shadow-medium);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }
 
 .success {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
 }
 
 .error {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
 }
 
 /* ---------- Subtle Fade-in Animation ---------- */
@@ -179,17 +218,44 @@ i {
 
 .border,
 h1 {
-  animation: fadeIn 0.6s ease forwards;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+h1 {
+  animation-delay: 0.1s;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+.border {
+  animation-delay: 0.2s;
+  opacity: 0;
+  animation-fill-mode: forwards;
 }
 
 /* ---------- Responsive ---------- */
-@media (max-width: 400px) {
+@media (max-width: 480px) {
   .border {
-    width: 85%;
-    padding: 35px 25px;
+    width: 90%;
+    padding: 40px 32px;
   }
 
   h1 {
-    font-size: 1.5rem;
+    font-size: 24px;
+    margin-bottom: 28px;
+  }
+
+  .sign-in-text {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 360px) {
+  .border {
+    padding: 32px 24px;
+  }
+
+  h1 {
+    font-size: 22px;
   }
 }

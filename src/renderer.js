@@ -7,6 +7,27 @@ const noteContent = document.getElementById("noteContent");
 const searchInput = document.getElementById("searchInput");
 const wordCount = document.getElementById("wordCount");
 const lastSaved = document.getElementById("lastSaved");
+const toggle = document.querySelector('.toggle-wrap');
+const darkMode = document.getElementById("darkModeLink");
+
+// toggle dark or light mode
+const userTheme = localStorage.getItem('theme'); // gets the current theme
+if (userTheme == 'dark') {
+  darkMode.disabled = false; // darkMode is applied
+  toggle.classList.add('active');
+}
+toggle.addEventListener("click", (event) => {
+  if (darkMode.disabled) { // If darkMode disabled 
+    darkMode.disabled = false; // then enable the darkmode, enable the darkMode.css 
+    toggle.classList.add('active');
+    localStorage.setItem('theme', 'dark'); // setting the current theme to dark in the local storage
+  } else {
+    darkMode.disabled = true;
+    toggle.classList.remove('active');
+    localStorage.setItem('theme', 'light'); // setting the current theme to light in the local storage
+  }
+})
+
 
 // State
 let notes = [];
@@ -179,6 +200,7 @@ function renderNotesList(filter = "") {
     const date = new Date(note.updatedAt).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
+      year: "numeric",
     });
 
     noteItem.innerHTML = `
@@ -210,8 +232,8 @@ function updateWordCount() {
 function updateLastSaved() {
   const now = new Date();
   const time = now.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
+    hour: "numeric", // shows the hour without leading zero
+    minute: "2-digit", // two digits for minutes
   });
   lastSaved.textContent = `Saved at ${time}`;
 }

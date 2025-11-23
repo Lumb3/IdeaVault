@@ -1,0 +1,211 @@
+/* Dark Mode - Enhanced Minimalist Design */
+:root {
+  --bg-primary: #1c1c1e;
+  --bg-secondary: #252527;
+  --bg-hover: #2f2f31;
+  --text-primary: #ebebeb;
+  --text-secondary: #b4b4b4;
+  --text-muted: #8a8a8a;
+  --border-color: #38383a;
+  --accent-color: #d4a574;
+  --accent-hover: #c09358;
+  --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-medium: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Sidebar */
+.sidebar {
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+}
+
+.sidebar-header {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-header h1 {
+  color: var(--text-primary);
+}
+
+.btn-new {
+  background: var(--accent-color);
+  color: #1c1c1e;
+  box-shadow: var(--shadow-light);
+}
+
+.btn-new:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-medium);
+}
+
+.btn-new:active {
+  transform: translateY(0);
+}
+
+.search-input {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.search-input:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.15);
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Notes List */
+.note-item {
+  border: 1px solid transparent;
+}
+
+.note-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-color);
+}
+
+.note-item.active {
+  background: var(--bg-primary);
+  border-color: var(--accent-color);
+  box-shadow: var(--shadow-light);
+}
+
+.note-item-title {
+  color: var(--text-primary);
+}
+
+.note-item-preview {
+  color: var(--text-secondary);
+}
+
+.note-item-date {
+  color: var(--text-muted);
+}
+
+/* Editor */
+.editor-container {
+  background: var(--bg-primary);
+}
+
+.editor-header {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.note-title {
+  color: var(--text-primary);
+  background: transparent;
+}
+
+.note-title::placeholder {
+  color: var(--text-muted);
+}
+
+.note-content {
+  color: var(--text-primary);
+  background: var(--bg-primary);
+}
+
+.note-content::placeholder {
+  color: var(--text-muted);
+}
+
+.editor-footer {
+  border-top: 1px solid var(--border-color);
+  color: var(--text-muted);
+}
+
+/* Buttons */
+.reset-btn,
+.btn-icon {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.reset-btn:hover,
+.btn-icon:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--accent-color);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-light);
+}
+
+.reset-btn:active,
+.btn-icon:active {
+  transform: translateY(0);
+}
+
+.reset-btn i,
+.btn-icon i {
+  color: var(--accent-color) !important;
+}
+
+.reset-btn:hover i,
+.btn-icon:hover i {
+  color: var(--accent-hover) !important;
+}
+
+/* Toggle Switch */
+.toggle-wrap {
+  background: var(--border-color);
+}
+
+.toggle-wrap:hover {
+  background: var(--accent-color);
+}
+
+.toggle-wrap .toggle {
+  background: var(--bg-primary);
+  box-shadow: var(--shadow-light);
+}
+
+.toggle-wrap.active {
+  background: var(--accent-color);
+}
+
+.toggle-wrap .toggle .sun-icon {
+  color: #ffa500;
+}
+
+.toggle-wrap .toggle .moon-icon {
+  color: #ffd700;
+}
+
+/* Scrollbar */
+.notes-list::-webkit-scrollbar-thumb,
+.note-content::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+}
+
+.notes-list::-webkit-scrollbar-thumb:hover,
+.note-content::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-color);
+}
+
+/* Empty State */
+.empty-state {
+  color: var(--text-muted);
+}
+
+.empty-state h2 {
+  color: var(--text-secondary);
+}
+
+/* Selection */
+::selection {
+  background: var(--accent-color);
+  color: var(--bg-primary);
+}
+
+::-moz-selection {
+  background: var(--accent-color);
+  color: var(--bg-primary);
+}

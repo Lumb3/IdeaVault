@@ -19,20 +19,21 @@ togglePassword.addEventListener("click", function () {
 loginBtn.addEventListener("click", checkPasswordandUsername);
 async function checkPasswordandUsername() {
   const response = await window.authAPI.login(username.value, password.value);
-
+  alertBox.classList.remove("error", "success");
   if (response.success) {
     toggle_Lock.classList.add("fa-lock-open");
+    alertBox.classList.add("success");
+    alertBox.style.display = "block";
     alertBox.textContent = "Login Successful";
-    alertBox.className = "success";
     setTimeout(() => {
       alertBox.style.display = "none";
       window.location.href = "index.html";
     }, 800);
     console.log("Password Matched. Success");
   } else {
+    alertBox.classList.add("error");
+    alertBox.style.display = "block";
     alertBox.textContent = "Incorrect username or password";
-    alertBox.className = "error";
-    alertBox.style.display = "block"; // Change the CSS property of the element
     console.log("Wrong Password. Error");
   }
 }
