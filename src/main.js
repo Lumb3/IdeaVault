@@ -91,7 +91,8 @@ ipcMain.handle("load-notes", async () => {
 });
 
 ipcMain.handle("save-notes", async (event, notes) => {
-  if (!Array.isArray(notes) || notes.length === 0) { // if the data is not in array format
+  if (!Array.isArray(notes) || notes.length === 0) {
+    // if the data is not in array format
     return;
   }
 
@@ -138,7 +139,7 @@ ipcMain.handle("save-notes", async (event, notes) => {
     console.error("Error saving notes:", err);
     throw err;
   } finally {
-    client.release();  // releases the database connection
+    client.release(); // releases the database connection
   }
 });
 

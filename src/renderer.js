@@ -7,27 +7,16 @@ const noteContent = document.getElementById("noteContent");
 const searchInput = document.getElementById("searchInput");
 const wordCount = document.getElementById("wordCount");
 const lastSaved = document.getElementById("lastSaved");
-const toggle = document.querySelector('.toggle-wrap');
+const toggle = document.querySelector(".toggle-wrap");
 const darkMode = document.getElementById("darkModeLink");
+const download_note = document.querySelector(".download-btn");
 
 // toggle dark or light mode
-const userTheme = localStorage.getItem('theme'); // gets the current theme
-if (userTheme == 'dark') {
+const userTheme = localStorage.getItem("theme"); // gets the current theme
+if (userTheme == "dark") {
   darkMode.disabled = false; // darkMode is applied
-  toggle.classList.add('active');
+  toggle.classList.add("active");
 }
-toggle.addEventListener("click", (event) => {
-  if (darkMode.disabled) { // If darkMode disabled 
-    darkMode.disabled = false; // then enable the darkmode, enable the darkMode.css 
-    toggle.classList.add('active');
-    localStorage.setItem('theme', 'dark'); // setting the current theme to dark in the local storage
-  } else {
-    darkMode.disabled = true;
-    toggle.classList.remove('active');
-    localStorage.setItem('theme', 'light'); // setting the current theme to light in the local storage
-  }
-})
-
 
 // State
 let notes = [];
@@ -49,6 +38,129 @@ function setupEventListeners() {
   searchInput.addEventListener("input", handleSearch);
   noteContent.addEventListener("input", updateWordCount);
   document.querySelector(".reset-btn").addEventListener("click", exit);
+  download_note.addEventListener("click", download);
+  toggle.addEventListener("click", toggleDarkMode);
+}
+function toggleDarkMode() {
+  if (darkMode.disabled) {
+    // If darkMode disabled
+    darkMode.disabled = false; // then enable the darkmode, enable the darkMode.css
+    toggle.classList.add("active");
+    localStorage.setItem("theme", "dark"); // setting the current theme to dark in the local storage
+  } else {
+    darkMode.disabled = true;
+    toggle.classList.remove("active");
+    localStorage.setItem("theme", "light"); // setting the current theme to light in the local storage
+  }
+}
+async function download() {
+  if (!currentNoteId) {
+    alert("Please select a note to downlaod");
+    return;
+  }
+  const note = notes.find((n) => n.id == currentNoteId);
+  if (!note) return;
+
+  // Create a popup modal for format selection
+  const modal = document.createElement("div");
+  modal.className = "download-modal";
+  modal.innerHTML = `
+    <div class="download-modal-content">
+      <h3>Download Note</h3>
+      <p>Choose a format:</p>
+      <div class="format-buttons">
+        <button class="format-btn" data-format="txt">
+          <i class="fa-solid fa-file-lines"></i>
+          Text (.txt)
+        </button>
+        <button class="format-btn" data-format="pdf">
+          <i class="fa-solid fa-file-pdf"></i>
+          PDF (.pdf)
+        </button>
+        <button class="format-btn" data-format="docx">
+          <i class="fa-solid fa-file-word"></i>
+          Word (.docx)
+        </button>
+        <button class="format-btn" data-format="md">
+          <i class="fa-solid fa-file-code"></i>
+          Markdown (.md)
+        </button>
+        <button class="format-btn" data-format="html">
+          <i class="fa-solid fa-globe"></i>
+          HTML (.html)
+        </button>
+        <button class="format-btn" data-format="json">
+          <i class="fa-solid fa-code"></i>
+          JSON (.json)
+        </button>
+      </div>
+      <button class="cancel-btn">Cancel</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  // Handle format selection
+  modal.querySelectorAll(".format-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const format = btn.dataset.format; // get the format
+      // Show loading state
+      btn.innerHTML =
+        '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
+      btn.disabled = true;
+      try {
+        await downloadNote(note, format);
+      } catch (error) {
+        console.error("Download failed:", error);
+        alert(
+          `Failed to download as ${format.toUpperCase()}. Please try again.`
+        );
+      }
+
+      document.body.removeChild(modal);
+    });
+  });
+  modal.querySelector(".cancel-btn").addEventListener("click", () => {
+    document.body.removeChild(modal);
+  });
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      document.body.removeChild(modal);
+    }
+  });
+}
+
+function downloadNote(note, format) {
+  const fileName = sanitizeFileName(note.title);
+  switch(format) {
+    case "txt":
+        downloadTXT(note, fileName);
+        break;
+    case "pdf":
+        downloadPDF(note, fileName);
+        break;
+    case "docs":
+        downloadDOCS(note, fileName);
+        break;
+  }
+}
+// Download the Note Title and Note Content
+function downloadTXT(note, fileName) {
+
+}
+function downloadPDF(note, fileName) {
+
+}
+function downloadDOCS(note, fileName) {
+
+}
+
+function sanitizeFileName(notes_arr) {
+  return filename
+    .replace(/[^a-z0-9]/gi, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_|_$/g, "")
+    .toLowerCase()
+    .substring(0, 50) || "untitled";
 }
 
 // Save and exit
