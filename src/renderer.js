@@ -81,18 +81,6 @@ async function download() {
           <i class="fa-solid fa-file-word"></i>
           Word (.docx)
         </button>
-        <button class="format-btn" data-format="md">
-          <i class="fa-solid fa-file-code"></i>
-          Markdown (.md)
-        </button>
-        <button class="format-btn" data-format="html">
-          <i class="fa-solid fa-globe"></i>
-          HTML (.html)
-        </button>
-        <button class="format-btn" data-format="json">
-          <i class="fa-solid fa-code"></i>
-          JSON (.json)
-        </button>
       </div>
       <button class="cancel-btn">Cancel</button>
     </div>
@@ -139,23 +127,160 @@ function downloadNote(note, format) {
         downloadPDF(note, fileName);
         break;
     case "docs":
-        downloadDOCS(note, fileName);
+        downloadDOCX(note, fileName);
         break;
   }
 }
-// Download the Note Title and Note Content
+// Download the Note Title and Note Content as txt
 function downloadTXT(note, fileName) {
-
+  const content = `${note.title}\n${"=".repeat(note.title.length)}\n\n${note.content}\n\n---\nCreated: ${new Date(note.createdAt).toLocaleString()}\nLast Updated: ${new Date(note.updatedAt).toLocaleString()}`;
+  downloadFile(content, `${fileName}.txt`, "text/plain")
 }
+
+// Download as PDF
 function downloadPDF(note, fileName) {
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 20; // empty space between content and the edge of the PDF page
+  const maxWidth = pageWidth - 2 * margin;
+  let yPosition = margin;
 
+  // Title
+  doc.setFontSize(20);
+  doc.setFont(undefined, "bold");
+  const titleLines = doc.splitTextToSize(note.title, maxWidth); // wrapping the text
+  doc.text(titleLines, margin, yPosition);
+  yPosition += titleLines.length * 10 + 10;
+
+  // Line separator
+  doc.setLineWidth(0.5);
+  doc.line(margin, yPosition, pageWidth - margin, yPosition);
+  yPosition += 10;
+
+  // Content
+  doc.setFontSize(12);
+  doc.setFont(undefined, "normal"); // font
+  const contentLines = doc.splitTextToSize(note.content || "No content", maxWidth); // wrapping the text
+  contentLines.forEach((line) => {
+    if (yPosition > pageHeight - margin) { // If it's about to print the content below the bottom margin
+      doc.addPage(); // add one more new page
+      yPosition = margin;
+    }
+    doc.text(line, margin, yPosition);
+    yPosition += 7;
+  })
+
+  yPosition += 10;
+  if (yPosition > pageHeight - margin - 20) {
+    doc.addPage(); // add one more new page
+    yPosition = margin;
+  }
+  doc.setFontSize(9);
+  doc.setTextColor(128, 128, 128);
+  doc.text(`Created: ${note.createdAt.toLocaleString()}`, margin, yPosition);
+  doc.save(`${fileName}.pdf`);
 }
-function downloadDOCS(note, fileName) {
 
+// Download as DOCX
+async function downloadDOCX(note, fileName) {
+  const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle } = docx;
+
+  const doc = new Document({
+    sections: [{
+      properties: {},
+      children: [
+        // Title
+        new Paragraph({
+          text: note.title,
+          heading: HeadingLevel.HEADING_1,
+          spacing: {
+            after: 200,
+          },
+        }),
+        
+        // Separator line (using bottom border)
+        new Paragraph({
+          border: {
+            bottom: {
+              color: "000000",
+              space: 1,
+              style: BorderStyle.SINGLE,
+              size: 6,
+            },
+          },
+          spacing: {
+            after: 200,
+          },
+        }),
+        
+        // Content
+        ...note.content.split('\n').map(line => 
+          new Paragraph({
+            children: [new TextRun(line || " ")],
+            spacing: {
+              after: 100,
+            },
+          })
+        ),
+        
+        // Empty line before metadata
+        new Paragraph({
+          text: "",
+          spacing: {
+            before: 200,
+          },
+        }),
+        
+        // Metadata
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: `Created: ${new Date(note.createdAt).toLocaleString()}`,
+              italics: true,
+              size: 18,
+              color: "808080",
+            }),
+          ],
+        }),
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: `Last Updated: ${new Date(note.updatedAt).toLocaleString()}`,
+              italics: true,
+              size: 18,
+              color: "808080",
+            }),
+          ],
+        }),
+      ],
+    }],
+  });
+
+  const blob = await Packer.toBlob(doc);
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${fileName}.docx`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
-function sanitizeFileName(notes_arr) {
-  return filename
+function downloadFile(content, filename, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); // anchor element 
+  a.href = url;
+  a.download = filename;
+  a.click(); // download the file
+  URL.revokeObjectURL(url);
+}
+
+function sanitizeFileName(fileName) {
+  return fileName
     .replace(/[^a-z0-9]/gi, "_")
     .replace(/_+/g, "_")
     .replace(/^_|_$/g, "")
