@@ -55,7 +55,7 @@ function toggleDarkMode() {
 }
 async function download() {
   if (!currentNoteId) {
-    alert("Please select a note to downlaod");
+    alert("Please select a note to download");
     return;
   }
   const note = notes.find((n) => n.id == currentNoteId);
@@ -119,27 +119,36 @@ async function download() {
 
 function downloadNote(note, format) {
   const fileName = sanitizeFileName(note.title);
-  switch(format) {
+  switch (format) {
     case "txt":
-        downloadTXT(note, fileName);
-        break;
+      downloadTXT(note, fileName);
+      break;
     case "pdf":
-        downloadPDF(note, fileName);
-        break;
-    case "docs":
-        downloadDOCX(note, fileName);
-        break;
+      downloadPDF(note, fileName);
+      break;
+    case "docx":
+      downloadDOCX(note, fileName);
+      break;
+    default:
+      console.log("Error in identifying file format!");
+      return;
   }
 }
 // Download the Note Title and Note Content as txt
 function downloadTXT(note, fileName) {
-  const content = `${note.title}\n${"=".repeat(note.title.length)}\n\n${note.content}\n\n---\nCreated: ${new Date(note.createdAt).toLocaleString()}\nLast Updated: ${new Date(note.updatedAt).toLocaleString()}`;
-  downloadFile(content, `${fileName}.txt`, "text/plain")
+  const content = `${note.title}\n${"=".repeat(note.title.length)}\n\n${
+    note.content
+  }\n\n---\nCreated: ${new Date(
+    note.createdAt
+  ).toLocaleString()}\nLast Updated: ${new Date(
+    note.updatedAt
+  ).toLocaleString()}`;
+  downloadFile(content, `${fileName}.txt`, "text/plain");
 }
 
 // Download as PDF
 function downloadPDF(note, fileName) {
-  const {jsPDF} = window.jspdf;
+  const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -162,15 +171,19 @@ function downloadPDF(note, fileName) {
   // Content
   doc.setFontSize(12);
   doc.setFont(undefined, "normal"); // font
-  const contentLines = doc.splitTextToSize(note.content || "No content", maxWidth); // wrapping the text
+  const contentLines = doc.splitTextToSize(
+    note.content || "No content",
+    maxWidth
+  ); // wrapping the text
   contentLines.forEach((line) => {
-    if (yPosition > pageHeight - margin) { // If it's about to print the content below the bottom margin
+    if (yPosition > pageHeight - margin) {
+      // If it's about to print the content below the bottom margin
       doc.addPage(); // add one more new page
       yPosition = margin;
     }
     doc.text(line, margin, yPosition);
     yPosition += 7;
-  })
+  });
 
   yPosition += 10;
   if (yPosition > pageHeight - margin - 20) {
@@ -183,96 +196,127 @@ function downloadPDF(note, fileName) {
   doc.save(`${fileName}.pdf`);
 }
 
+// Fetch the docx API
+async function fetch() {
+  try {
+    console.log("exporting note to DOCX: ", note.title);
+    const obj = await window.authAPI.docxComponents();
+    return obj;
+  } catch (error) {
+    console.log("Error expoerting to DOCS: ", error);
+    throw error;
+  }
+}
+
 // Download as DOCX
 async function downloadDOCX(note, fileName) {
-  const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle } = docx;
+  try {
+    // Get docx components from main process
+    const obj = fetch();
 
-  const doc = new Document({
-    sections: [{
-      properties: {},
-      children: [
-        // Title
-        new Paragraph({
-          text: note.title,
-          heading: HeadingLevel.HEADING_1,
-          spacing: {
-            after: 200,
-          },
-        }),
-        
-        // Separator line (using bottom border)
-        new Paragraph({
-          border: {
-            bottom: {
-              color: "000000",
-              space: 1,
-              style: BorderStyle.SINGLE,
-              size: 6,
-            },
-          },
-          spacing: {
-            after: 200,
-          },
-        }),
-        
-        // Content
-        ...note.content.split('\n').map(line => 
-          new Paragraph({
-            children: [new TextRun(line || " ")],
-            spacing: {
-              after: 100,
-            },
-          })
-        ),
-        
-        // Empty line before metadata
-        new Paragraph({
-          text: "",
-          spacing: {
-            before: 200,
-          },
-        }),
-        
-        // Metadata
-        new Paragraph({
+    // Create document with sections
+    const doc = new obj.Document({
+      sections: [
+        {
+          properties: {},
           children: [
-            new TextRun({
-              text: `Created: ${new Date(note.createdAt).toLocaleString()}`,
-              italics: true,
-              size: 18,
-              color: "808080",
+            // Title
+            new obj.Paragraph({
+              text: note.title,
+              heading: HeadingLevel.HEADING_1,
+              spacing: {
+                after: 200,
+              },
+            }),
+
+            // Separator line (using border)
+            new obj.Paragraph({
+              border: {
+                bottom: {
+                  color: "000000",
+                  space: 1,
+                  style: BorderStyle.SINGLE,
+                  size: 6,
+                },
+              },
+              spacing: {
+                after: 200,
+              },
+            }),
+
+            // Content - split by paragraphs
+            ...note.content.split("\n").map(
+              (line) =>
+                new obj.Paragraph({
+                  children: [
+                    new obj.TextRun({
+                      text: line || " ", // Empty line if blank
+                      size: 24, // 12pt font (size is in half-points)
+                    }),
+                  ],
+                  spacing: {
+                    after: 100,
+                  },
+                })
+            ),
+
+            // Spacing before metadata
+            new obj.Paragraph({
+              text: "",
+              spacing: {
+                after: 200,
+              },
+            }),
+
+            // Metadata
+            new obj.Paragraph({
+              children: [
+                new obj.TextRun({
+                  text: `Created: ${new Date(note.createdAt).toLocaleString()}`,
+                  size: 18, // 9pt font
+                  color: "808080",
+                }),
+              ],
+            }),
+            new obj.Paragraph({
+              children: [
+                new obj.TextRun({
+                  text: `Last Updated: ${new Date(
+                    note.updatedAt
+                  ).toLocaleString()}`,
+                  size: 18,
+                  color: "808080",
+                }),
+              ],
             }),
           ],
-        }),
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: `Last Updated: ${new Date(note.updatedAt).toLocaleString()}`,
-              italics: true,
-              size: 18,
-              color: "808080",
-            }),
-          ],
-        }),
+        },
       ],
-    }],
-  });
+    });
 
-  const blob = await Packer.toBlob(doc);
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${fileName}.docx`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+    // Generate blob and download
+    const buffer = await Packer.toBuffer(doc);
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${fileName}.docx`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("Error generating DOCX:", error);
+    alert("Error generating DOCX file: " + error.message);
+  }
 }
 
 function downloadFile(content, filename, mimeType) {
   const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a"); // anchor element 
+  const a = document.createElement("a"); // anchor element
   a.href = url;
   a.download = filename;
   a.click(); // download the file
@@ -280,12 +324,14 @@ function downloadFile(content, filename, mimeType) {
 }
 
 function sanitizeFileName(fileName) {
-  return fileName
-    .replace(/[^a-z0-9]/gi, "_")
-    .replace(/_+/g, "_")
-    .replace(/^_|_$/g, "")
-    .toLowerCase()
-    .substring(0, 50) || "untitled";
+  return (
+    fileName
+      .replace(/[^a-z0-9]/gi, "_")
+      .replace(/_+/g, "_")
+      .replace(/^_|_$/g, "")
+      .toLowerCase()
+      .substring(0, 50) || "untitled"
+  );
 }
 
 // Save and exit

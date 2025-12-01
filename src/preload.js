@@ -42,4 +42,12 @@ contextBridge.exposeInMainWorld("authAPI", {
       throw error;
     }
   },
+  docxComponents: async () => {
+    try {
+      return await ipcRenderer.invoke("get-docx-components");
+    } catch (e) {
+      console.log("Error getting docx components", e);
+      throw e;
+    }
+  },
 });

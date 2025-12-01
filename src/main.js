@@ -3,6 +3,8 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const bcrypt = require("bcryptjs");
 const { Pool } = require("pg");
+const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle } = require('docx');
+
 
 // PostgreSQL pool (for interaction with tables) setup
 const pool = new Pool({
@@ -42,6 +44,12 @@ async function initDatabase() {
     console.error("Error initializing database:", err);
   }
 }
+// Add this IPC handler
+ipcMain.handle('get-docx-components', async () => {
+  return {
+    Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle
+  };
+});
 
 // Handle login attempt from renderer
 ipcMain.handle("login-attempt", async (event, { username, password }) => {
