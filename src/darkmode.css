@@ -110,9 +110,23 @@ body {
 }
 
 .note-content {
+  flex: 1;
+  padding: 36px 44px;
+  background: #1f1f21;
+  border: 1px solid #3a3a3c;   
+  border-radius: 14px;
+  font-family: "Inter", "SF Pro Text", system-ui, sans-serif;
+  font-size: 18px;
+  line-height: 1.9;
   color: var(--text-primary);
-  background: var(--bg-primary);
+  letter-spacing: 0.3px;
+  word-spacing: 1px;
+  outline: none;
+  resize: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35); 
+  caret-color: #d4a574;
 }
+
 
 .note-content::placeholder {
   color: var(--text-muted);
