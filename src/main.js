@@ -3,15 +3,14 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const bcrypt = require("bcryptjs");
 const { Pool } = require("pg");
-const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle } = require('docx');
+const { Document, Packer, Paragraph, TextRun, HeadingLevel, BorderStyle } = require("docx");
 
-
-// PostgreSQL pool (for interaction with tables) setup
+// PostgreSQL pool setup
 const pool = new Pool({
-  user: "eric", // your DB user
+  user: "eric",
   host: "localhost",
   database: "my_database",
-  password: "", // add DB password if needed
+  password: "",
   port: 5432,
   max: 20,
   idleTimeoutMillis: 30000,
@@ -44,126 +43,224 @@ async function initDatabase() {
     console.error("Error initializing database:", err);
   }
 }
-// Add this IPC handler
-ipcMain.handle('get-docx-components', async () => {
-  return {
-    Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle
-  };
-});
 
-// Handle login attempt from renderer
-ipcMain.handle("login-attempt", async (event, { username, password }) => {
-  try {
-    // Query user by username
-    const res = await pool.query("SELECT * FROM users WHERE username = $1", [
-      username,
-    ]);
+// Register all IPC handlers
+function registerIPCHandlers() {
+  console.log("Registering IPC handlers...");
 
-    if (res.rows.length === 0) {
-      return { success: false, message: "User not found" };
+  // Handle DOCX generation
+  ipcMain.handle("generate-docx", async (event, noteData) => {
+    try {
+      console.log("Generating DOCX for note:", noteData.title);
+      const { title, content, createdAt, updatedAt } = noteData;
+      
+      // Split content into paragraphs
+      const contentParagraphs = content.split("\n").map(
+        (line) =>
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: line || " ",
+                size: 24,
+              }),
+            ],
+            spacing: {
+              after: 100,
+            },
+          })
+      );
+
+      // Create document
+      const doc = new Document({
+        sections: [
+          {
+            properties: {},
+            children: [
+              // Title
+              new Paragraph({
+                text: title,
+                heading: HeadingLevel.HEADING_1,
+                spacing: {
+                  after: 200,
+                },
+              }),
+
+              // Separator line
+              new Paragraph({
+                border: {
+                  bottom: {
+                    color: "000000",
+                    space: 1,
+                    style: BorderStyle.SINGLE,
+                    size: 6,
+                  },
+                },
+                spacing: {
+                  after: 200,
+                },
+              }),
+
+              // Content paragraphs
+              ...contentParagraphs,
+
+              // Spacing before metadata
+              new Paragraph({
+                text: "",
+                spacing: {
+                  after: 200,
+                },
+              }),
+
+              // Metadata
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: `Created: ${new Date(createdAt).toLocaleString()}`,
+                    size: 18,
+                    color: "808080",
+                  }),
+                ],
+              }),
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: `Last Updated: ${new Date(updatedAt).toLocaleString()}`,
+                    size: 18,
+                    color: "808080",
+                  }),
+                ],
+              }),
+            ],
+          },
+        ],
+      });
+
+      // Generate buffer
+      const buffer = await Packer.toBuffer(doc);
+      console.log("DOCX generated successfully, size:", buffer.length, "bytes");
+      return Array.from(buffer);
+    } catch (error) {
+      console.error("DOCX creation error:", error);
+      throw error;
+    }
+  });
+
+  // Handle login attempt
+  ipcMain.handle("login-attempt", async (event, { username, password }) => {
+    try {
+      const res = await pool.query("SELECT * FROM users WHERE username = $1", [
+        username,
+      ]);
+
+      if (res.rows.length === 0) {
+        return { success: false, message: "User not found" };
+      }
+
+      const user = res.rows[0];
+      const valid = bcrypt.compareSync(password, user.password);
+
+      if (valid) {
+        return { success: true, message: "Login successful" };
+      } else {
+        return { success: false, message: "Wrong password" };
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      return { success: false, message: "Server error" };
+    }
+  });
+
+  // Handle load notes
+  ipcMain.handle("load-notes", async () => {
+    try {
+      const res = await pool.query(
+        "SELECT * FROM notes ORDER BY updated_at DESC"
+      );
+      console.log("Successfully loaded", res.rows.length, "notes");
+
+      return res.rows.map((note) => ({
+        id: note.id,
+        title: note.title,
+        content: note.content,
+        createdAt: note.created_at,
+        updatedAt: note.updated_at,
+      }));
+    } catch (error) {
+      console.error("Error loading notes:", error);
+      return [];
+    }
+  });
+
+  // Handle save notes
+  ipcMain.handle("save-notes", async (event, notes) => {
+    if (!Array.isArray(notes) || notes.length === 0) {
+      return;
     }
 
-    const user = res.rows[0];
-    const valid = bcrypt.compareSync(password, user.password);
+    const client = await pool.connect();
 
-    if (valid) {
-      return { success: true, message: "Login successful" };
-    } else {
-      return { success: false, message: "Wrong password" };
+    try {
+      await client.query("BEGIN");
+
+      const values = [];
+      const placeholders = [];
+
+      notes.forEach((note, index) => {
+        const offset = index * 5;
+        placeholders.push(
+          `($${offset + 1}, $${offset + 2}, $${offset + 3}, $${offset + 4}, $${
+            offset + 5
+          })`
+        );
+        values.push(
+          note.id,
+          note.title,
+          note.content,
+          note.createdAt,
+          note.updatedAt
+        );
+      });
+
+      const query = `
+        INSERT INTO notes (id, title, content, created_at, updated_at)
+        VALUES ${placeholders.join(", ")}
+        ON CONFLICT (id) DO UPDATE
+        SET title = EXCLUDED.title,
+            content = EXCLUDED.content,
+            updated_at = EXCLUDED.updated_at
+      `;
+
+      await client.query(query, values);
+      await client.query("COMMIT");
+
+      console.log(`Successfully saved ${notes.length} notes`);
+    } catch (err) {
+      await client.query("ROLLBACK");
+      console.error("Error saving notes:", err);
+      throw err;
+    } finally {
+      client.release();
     }
-  } catch (err) {
-    console.error("Login error:", err);
-    return { success: false, message: "Server error" };
-  }
-});
+  });
 
-ipcMain.handle("load-notes", async () => {
-  try {
-    const res = await pool.query(
-      "SELECT * FROM notes ORDER BY updated_at DESC"
-    );
-    console.log("Successfully loaded the notes");
+  // Handle delete note
+  ipcMain.handle("delete-note", async (event, noteId) => {
+    try {
+      await pool.query("DELETE FROM notes WHERE id = $1", [noteId]);
+      console.log(`Successfully deleted note ${noteId}`);
+    } catch (err) {
+      console.error("Error deleting note:", err);
+      throw err;
+    }
+  });
 
-    // Map database columns to camelCase for JavaScript
-    return res.rows.map((note) => ({
-      id: note.id,
-      title: note.title,
-      content: note.content,
-      createdAt: note.created_at,
-      updatedAt: note.updated_at,
-    }));
-  } catch (error) {
-    console.log("Error loading notes: ", error);
-    return [];
-  }
-});
+  // Handle quit app
+  ipcMain.handle("quit-app", async () => {
+    app.quit();
+  });
 
-ipcMain.handle("save-notes", async (event, notes) => {
-  if (!Array.isArray(notes) || notes.length === 0) {
-    // if the data is not in array format
-    return;
-  }
-
-  const client = await pool.connect(); // Use connection pool
-
-  try {
-    await client.query("BEGIN"); // Start transaction
-
-    // Build batch query with multiple value sets
-    const values = [];
-    const placeholders = [];
-
-    notes.forEach((note, index) => {
-      const offset = index * 5;
-      placeholders.push(
-        `($${offset + 1}, $${offset + 2}, $${offset + 3}, $${offset + 4}, $${
-          offset + 5
-        })`
-      );
-      values.push(
-        note.id,
-        note.title,
-        note.content,
-        note.createdAt,
-        note.updatedAt
-      );
-    });
-
-    const query = `
-      INSERT INTO notes (id, title, content, created_at, updated_at)
-      VALUES ${placeholders.join(", ")}
-      ON CONFLICT (id) DO UPDATE
-      SET title = EXCLUDED.title,
-          content = EXCLUDED.content,
-          updated_at = EXCLUDED.updated_at
-    `;
-
-    await client.query(query, values);
-    await client.query("COMMIT");
-
-    console.log(`Successfully saved ${notes.length} notes`);
-  } catch (err) {
-    await client.query("ROLLBACK");
-    console.error("Error saving notes:", err);
-    throw err;
-  } finally {
-    client.release(); // releases the database connection
-  }
-});
-
-ipcMain.handle("delete-note", async (event, noteId) => {
-  try {
-    await pool.query("DELETE FROM notes WHERE id = $1", [noteId]);
-    console.log(`Successfully deleted note ${noteId}`);
-  } catch (err) {
-    console.error("Error deleting note:", err);
-    throw err;
-  }
-});
-
-ipcMain.handle("quit-app", async () => {
-  app.quit();
-});
+  console.log("All IPC handlers registered successfully");
+}
 
 // Create Electron window
 function createWindow() {
@@ -175,7 +272,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      preload: path.join(__dirname, "preload.js"), // Loading preload.js
+      preload: path.join(__dirname, "preload.js"),
     },
   });
 
@@ -184,7 +281,9 @@ function createWindow() {
 
 // App lifecycle
 app.setName("IdeaVault");
+
 app.whenReady().then(async () => {
+  registerIPCHandlers();
   await initDatabase();
   createWindow();
 });
@@ -193,9 +292,9 @@ app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     pool
       .end()
-      .then(() => console.log("Database connection lost."))
+      .then(() => console.log("Database connection closed."))
       .catch((error) =>
-        console.log("Error closing database connection: ", error)
+        console.error("Error closing database connection:", error)
       );
     app.quit();
   }
