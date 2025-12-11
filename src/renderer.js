@@ -346,7 +346,7 @@ function selectNote(id) {
 
   if (note) {
     noteTitle.value = note.title;
-    noteContent.value = note.content;
+    noteContent.innerHTML = note.content || "";  // copy the innerHTML of the textContent
     updateWordCount();
 
     document.querySelectorAll(".note-item").forEach((item) => {
@@ -354,6 +354,7 @@ function selectNote(id) {
     });
   }
 }
+
 
 // Handle Note Edit
 function handleNoteEdit() {
@@ -363,23 +364,26 @@ function handleNoteEdit() {
   if (!note) return;
 
   note.title = noteTitle.value || "Untitled";
-  note.content = noteContent.value;
+
+  // SAVE HTML, not plain text
+  note.content = noteContent.innerHTML;
+
   note.updatedAt = new Date().toISOString();
 
   const noteItem = document.querySelector(
     `.note-item[data-id="${currentNoteId}"]`
   );
+
   if (noteItem) {
     noteItem.querySelector(".note-item-title").textContent = note.title;
-    noteItem.querySelector(".note-item-preview").textContent =
-      note.content.substring(0, 60) || "No content";
+    noteItem.querySelector(".note-item-preview").innerText =
+      noteContent.innerText.substring(0, 60) || "No content";
   }
 
   clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(() => {
-    saveNotes();
-  }, 500);
+  saveTimeout = setTimeout(() => saveNotes(), 500);
 }
+
 
 // Render Notes List
 function renderNotesList(filter = "") {
@@ -389,7 +393,7 @@ function renderNotesList(filter = "") {
     ? notes.filter(
         (n) =>
           n.title.toLowerCase().includes(filter.toLowerCase()) ||
-          n.content.toLowerCase().includes(filter.toLowerCase())
+          stripHTML(n.content).toLowerCase().includes(filter.toLowerCase())
       )
     : notes;
 
@@ -423,6 +427,10 @@ function renderNotesList(filter = "") {
   });
 }
 
+function stripHTML(html) {
+  return html.replace(/<[^>]+>/g, "");
+}
+
 // Handle Search
 function handleSearch(e) {
   renderNotesList(e.target.value);
@@ -430,7 +438,7 @@ function handleSearch(e) {
 
 // Update Word Count
 function updateWordCount() {
-  const text = noteContent.value.trim();
+  const text = noteContent.innerText.trim();
   const words = text ? text.split(/\s+/).length : 0;
   wordCount.textContent = `${words} word${words !== 1 ? "s" : ""}`;
 }
@@ -449,7 +457,7 @@ function updateLastSaved() {
 function clearEditor() {
   currentNoteId = null;
   noteTitle.value = "";
-  noteContent.value = "";
+  noteContent.innerHTML = "";
   wordCount.textContent = "0 words";
   lastSaved.textContent = "";
 }

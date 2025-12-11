@@ -24,7 +24,6 @@ body {
     "Helvetica Neue", Arial, sans-serif;
   color: var(--text-primary);
   background: var(--bg-primary);
-  overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -165,7 +164,10 @@ body {
   display: flex;
   flex-direction: column;
   background: var(--bg-primary);
+  min-height: 0;
 }
+
+
 
 .editor-header {
   padding: 24px 40px;
@@ -421,9 +423,10 @@ body.dark-mode .cancel-btn:hover {
 
 .note-content {
   flex: 1;
-  padding: 36px 44px;                
+  min-height: 0;       
+  padding: 36px 44px;
   background: #fffdf7;
-  border: 1px solid #e7e2d4;         
+  border: 1px solid #e7e2d4;
   border-radius: 14px;
   font-family: "Inter", "SF Pro Text", system-ui, sans-serif;
   font-size: 18px;
@@ -433,8 +436,9 @@ body.dark-mode .cancel-btn:hover {
   color: var(--text-primary);
   outline: none;
   resize: none;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.06); 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
   caret-color: #c29553;
+  overflow-y: auto;
 }
 
 
