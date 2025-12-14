@@ -1,6 +1,6 @@
 # 💡 IdeaVault
 
-Welcome to **IdeaVault v1.0.0**!  
+Welcome to **IdeaVault v2.0.0**!  
 ---
 A simple desktop app for organizing notes and securely storing personal information. Future versions will support multiple users.
 
@@ -24,7 +24,8 @@ Electron.js • PostgreSQL • bcrypt.js • Node.js
 
 **Requirements:** macOS (ARM64), Internet connection
 
-1. Download **v1.0.0** from [Releases](https://github.com/Lumb3/IdeaVault/releases/tag/first_release)
+
+1. Download **v2.0.0** from [Releases](https://github.com/Lumb3/IdeaVault/releases/tag/second_release)
 2. Extract `IdeaVault.zip` and open the `mac-arm64` folder
 3. Double-click **IdeaVault** to launch
 
@@ -47,6 +48,8 @@ Electron.js • PostgreSQL • bcrypt.js • Node.js
   <img src="imgs/login.png" width="500" alt="Login Page"> 
   <img src="imgs/incorrect.png" width="500" alt="Wrong Password">
   <img src="imgs/example.png" width="500" alt="Main Page">
+  <img src="imgs/dark.png" width="500" alt="Dark Mode">
+  <img src="imgs/download.png" width="500" alt="Download Format">
 </p>
 
 ---

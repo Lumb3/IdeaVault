@@ -1,4 +1,5 @@
 import {TextDecorationToolbar} from "./decoration.js";
+import { image_upload } from "./img_uploader.js";
 const newNoteBtn = document.getElementById("newNoteBtn");
 const deleteBtn = document.getElementById("deleteBtn");
 const notesList = document.getElementById("notesList");
@@ -28,6 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadNotes();
   setupEventListeners();
   new TextDecorationToolbar();
+  new image_upload();
 });
 
 // Setup Event Listeners
