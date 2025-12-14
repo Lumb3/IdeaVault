@@ -1,0 +1,102 @@
+/* Text Decoration Toolbar */
+.decoration-toolbar {
+  position: fixed;
+  display: none;
+  background: #2c2c2c;
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  gap: 4px;
+  align-items: center;
+}
+
+.decoration-toolbar.active {
+  display: flex;
+}
+
+.decoration-btn {
+  background: transparent;
+  border: none;
+  color: #d9985b;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.decoration-btn:hover {
+  background: rgba(217, 152, 91, 0.2);
+}
+
+.decoration-btn.active {
+  background: rgba(217, 152, 91, 0.3);
+  color: #ffa94d;
+}
+
+.decoration-btn i {
+  pointer-events: none;
+}
+
+/* Color picker styling */
+.color-picker-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.decoration-btn input[type="color"] {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  left: 0;
+  top: 0;
+}
+
+/* Tooltip */
+.decoration-btn::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a1a;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  margin-bottom: 8px;
+}
+
+.decoration-btn:hover::before {
+  opacity: 1;
+}
+
+/* Separator line */
+.toolbar-separator {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 0 4px;
+}
+
+/* Dark mode adjustments */
+body:has(#darkModeLink:not([disabled])) .decoration-toolbar {
+  background: #1a1a1a;
+  border: 1px solid #333;
+}
+
+body:has(#darkModeLink:not([disabled])) .decoration-btn:hover {
+  background: rgba(217, 152, 91, 0.15);
+}
