@@ -1,6 +1,3 @@
-class image_upload {
+export class image_upload {
 
 }
-
-
-document.addEventListener()
