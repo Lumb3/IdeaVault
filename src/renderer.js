@@ -1,4 +1,4 @@
-// renderer.js
+import {TextDecorationToolbar} from "./decoration.js";
 const newNoteBtn = document.getElementById("newNoteBtn");
 const deleteBtn = document.getElementById("deleteBtn");
 const notesList = document.getElementById("notesList");
@@ -27,6 +27,7 @@ let saveTimeout = null;
 document.addEventListener("DOMContentLoaded", () => {
   loadNotes();
   setupEventListeners();
+  new TextDecorationToolbar();
 });
 
 // Setup Event Listeners

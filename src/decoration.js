@@ -1,5 +1,5 @@
 // decoration.js
-class TextDecorationToolbar {
+export class TextDecorationToolbar {
   constructor() {
     this.toolbar = null;
     this.noteContent = document.getElementById('noteContent');
@@ -49,11 +49,11 @@ class TextDecorationToolbar {
 
   attachEventListeners() {
     // Show toolbar on text selection
-    this.noteContent.addEventListener('mouseup', (e) => this.handleSelection(e));
-    this.noteContent.addEventListener('keyup', (e) => this.handleSelection(e));
+    this.noteContent.addEventListener('mouseup', (e) => this.handleSelection(e)); // when a mouse is lifted, mouseup event will be triggered
+    this.noteContent.addEventListener('keyup', (e) => this.handleSelection(e)); 
     
     // Hide toolbar when clicking outside
-    document.addEventListener('mousedown', (e) => {
+    document.addEventListener('mousedown', (e) => { // hide the toolbar in mouse is pressed
       if (!this.toolbar.contains(e.target) && e.target !== this.noteContent) {
         this.hideToolbar();
       }
@@ -199,8 +199,3 @@ class TextDecorationToolbar {
     }
   }
 }
-
-// Initialize the decoration toolbar when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-  new TextDecorationToolbar();
-});
