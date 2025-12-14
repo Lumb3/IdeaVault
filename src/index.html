@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>My Notes</title>
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="decoration.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
@@ -85,20 +86,18 @@
 
         </div>
 
-        <textarea
-          id="noteContent"
-          class="note-content"
-          placeholder="Start writing..."
-        ></textarea>
+        <div id="noteContent" class="note-content" contenteditable="true" placeholder="Start writing..."></div>
+
 
         <div class="editor-footer">
           <span class="word-count" id="wordCount">0 words</span>
           <span class="last-saved" id="lastSaved"></span>
         </div>
       </main>
+    </div>
 
     <script src="renderer.js"></script>
+    <script src="decoration.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
   </body>
 </html>
