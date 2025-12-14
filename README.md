@@ -24,7 +24,7 @@ Electron.js • PostgreSQL • bcrypt.js • Node.js
 
 **Requirements:** macOS (ARM64), Internet connection
 
-1. Download **v1.0.0** from [Releases](https://github.com/Lumb3/IdeaVault/releases/tag/v1.0.0)
+1. Download **v1.0.0** from [Releases](https://github.com/Lumb3/IdeaVault/releases/tag/first_release)
 2. Extract `IdeaVault.zip` and open the `mac-arm64` folder
 3. Double-click **IdeaVault** to launch
 
