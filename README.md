@@ -71,7 +71,8 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-<p align="center">Made with ❤️ by Lumb333</p>
+<p align="center">Made by <a href="http://github.com/Lumb3">Lumb333</a></p>
+<p align="center">Pentested by <a href="https://github.com/Zwique">Zwique</a></p>
 <p align="center">
   <a href="https://github.com/Lumb3/IdeaVault">⭐ Star this repository!</a>
 </p>
