@@ -1,3 +1,4 @@
+// renderer.js
 import { TextDecorationToolbar } from "./decoration.js";
 import { image_upload } from "./img_uploader.js";
 const newNoteBtn = document.getElementById("newNoteBtn");
@@ -358,6 +359,30 @@ async function deleteCurrentNote() {
     console.error("Failed to delete note:", error);
   }
 }
+// Restore image's size and alignment
+// <div class="image-wrapper" data-align="center" data-width="320px">
+function restoreImages() {
+  const wrappers = noteContent.querySelectorAll(".image-wrapper");
+  wrappers.forEach((wrapper) => {
+    const img = wrapper.querySelector("img");
+    if (!img) {
+      console.log("Error getting image");
+      return;
+    }
+
+    // Restore size
+    if (wrapper.dataset.width) {
+      img.style.width = wrapper.dataset.width;
+      img.style.maxWidth = "none";
+      img.style.height = "auto";
+    }
+
+    // Restore alignment
+    if (wrapper.dataset.align) {
+      wrapper.style.textAlign = wrapper.dataset.align;
+    }
+  });
+}
 
 // Select Note
 function selectNote(id) {
@@ -367,6 +392,7 @@ function selectNote(id) {
   if (note) {
     noteTitle.value = note.title;
     noteContent.innerHTML = note.content || ""; // copy the innerHTML of the textContent
+    restoreImages();
     updateWordCount();
 
     document.querySelectorAll(".note-item").forEach((item) => {
@@ -374,6 +400,17 @@ function selectNote(id) {
     });
   }
 }
+
+function cleanEditorHTML() {
+  const clone = noteContent.cloneNode(true);
+
+  clone.querySelectorAll(
+    ".image-toolbar, .resize-handle, .width-label"
+  ).forEach(el => el.remove());
+
+  return clone.innerHTML;
+}
+
 
 // Handle Note Edit
 function handleNoteEdit() {
@@ -385,7 +422,7 @@ function handleNoteEdit() {
   note.title = noteTitle.value || "Untitled";
 
   // SAVE HTML, not plain text
-  note.content = noteContent.innerHTML;
+  note.content = cleanEditorHTML();
 
   note.updatedAt = new Date().toISOString();
 

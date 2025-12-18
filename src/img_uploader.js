@@ -19,7 +19,7 @@ export class image_upload {
 
     // Prevent default drag behaviors
     ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
-      this.noteContent.addEventListener(eventName, this.preventDefaults, false);
+      this.noteContent.addEventListener(eventName, this.preventDefaults.bind(this), false);
     });
 
     // Handle file drop
@@ -32,7 +32,8 @@ export class image_upload {
         e.target.classList.contains("uploaded-image")
       ) {
         this.selectImage(e.target);
-      } else {
+      } else if (!e.target.closest('.image-toolbar') && !e.target.closest('.resize-handle')) {
+        // Only deselect if clicking outside toolbar and resize handle
         this.deselectImage();
       }
     });
@@ -59,6 +60,9 @@ export class image_upload {
     reader.onload = (event) => {
       const wrapper = this.createImageWrapper(event.target.result);
       this.insertAtCaret(wrapper);
+      
+      // Trigger save
+      this.noteContent.dispatchEvent(new Event("input", { bubbles: true }));
     };
     reader.readAsDataURL(file);
   }
@@ -94,6 +98,11 @@ export class image_upload {
   }
 
   selectImage(img) {
+    // If clicking the same image, don't recreate controls
+    if (this.activeImage === img) {
+      return;
+    }
+
     this.deselectImage();
     this.activeImage = img;
     const wrapper = img.parentElement;
@@ -109,19 +118,25 @@ export class image_upload {
   deselectImage() {
     if (this.activeImage) {
       const wrapper = this.activeImage.parentElement;
-      wrapper.style.outline = "none";
+      if (wrapper) {
+        wrapper.style.outline = "none";
 
-      // Remove existing controls
-      const existingControls = wrapper.querySelectorAll(
-        ".image-control, .image-toolbar"
-      );
-      existingControls.forEach((control) => control.remove());
+        // Remove existing controls (they're not saved anyway)
+        const existingControls = wrapper.querySelectorAll(
+          ".image-control, .image-toolbar"
+        );
+        existingControls.forEach((control) => control.remove());
+      }
 
       this.activeImage = null;
     }
   }
 
   createControls(wrapper) {
+    // Remove any existing controls first (in case of re-selection)
+    const existingControls = wrapper.querySelectorAll('.image-toolbar, .image-control');
+    existingControls.forEach(control => control.remove());
+
     // Create toolbar
     const toolbar = document.createElement("div");
     toolbar.className = "image-toolbar";
@@ -137,6 +152,7 @@ export class image_upload {
       border-radius: 8px;
       z-index: 100;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      white-space: nowrap;
     `;
 
     // Alignment buttons
@@ -148,6 +164,7 @@ export class image_upload {
 
     alignments.forEach(({ icon, align, title }) => {
       const btn = document.createElement("button");
+      btn.dataset.align = align;
       btn.className = "toolbar-btn";
       btn.innerHTML = `<i class="fa-solid ${icon}"></i>`;
       btn.title = title;
@@ -186,7 +203,7 @@ export class image_upload {
         this.setAlignment(wrapper, align);
 
         // Update button states
-        toolbar.querySelectorAll(".toolbar-btn").forEach((b, i) => {
+        toolbar.querySelectorAll(".toolbar-btn[data-align]").forEach((b, i) => {
           b.style.background =
             alignments[i].align === align ? "#c9a365" : "transparent";
         });
@@ -238,6 +255,9 @@ export class image_upload {
       e.stopPropagation();
       wrapper.remove();
       this.activeImage = null;
+      
+      // Trigger save after deletion
+      this.noteContent.dispatchEvent(new Event("input", { bubbles: true }));
     });
 
     toolbar.appendChild(deleteBtn);
@@ -292,45 +312,74 @@ export class image_upload {
   setAlignment(wrapper, align) {
     wrapper.dataset.align = align;
     wrapper.style.textAlign = align;
+    
+    // Trigger save after alignment change
+    this.noteContent.dispatchEvent(new Event("input", { bubbles: true }));
   }
 
   startResize(e) {
+    if (!this.activeImage) return;
+    
     this.resizing = true;
     this.startX = e.clientX;
     this.startWidth = this.activeImage.offsetWidth;
     this.startHeight = this.activeImage.offsetHeight;
     document.body.style.cursor = "nwse-resize";
+    document.body.style.userSelect = "none";
   }
 
   handleMouseMove(e) {
     if (this.resizing && this.activeImage) {
+      e.preventDefault();
+      
       const deltaX = e.clientX - this.startX;
       const newWidth = this.startWidth + deltaX;
+      const maxWidth = this.noteContent.offsetWidth;
 
-      if (newWidth > 50 && newWidth <= this.noteContent.offsetWidth) {
+      if (newWidth > 50 && newWidth <= maxWidth) {
         this.activeImage.style.width = newWidth + "px";
         this.activeImage.style.maxWidth = "none";
         this.activeImage.style.height = "auto";
 
         // Update width label
         const wrapper = this.activeImage.parentElement;
-        const widthLabel = wrapper.querySelector(".width-label");
-        if (widthLabel) {
-          widthLabel.textContent = `${Math.round(newWidth)}px`;
+        if (wrapper) {
+          const widthLabel = wrapper.querySelector(".width-label");
+          if (widthLabel) {
+            widthLabel.textContent = `${Math.round(newWidth)}px`;
+          }
         }
       }
     }
   }
 
   handleMouseUp() {
+    if (this.resizing && this.activeImage) {
+      const wrapper = this.activeImage.parentElement;
+      if (wrapper) {
+        // Store the width in dataset for restoration
+        wrapper.dataset.width = this.activeImage.style.width;
+
+        // Trigger save after resize
+        this.noteContent.dispatchEvent(
+          new Event("input", { bubbles: true })
+        );
+      }
+    }
+    
     this.resizing = false;
     document.body.style.cursor = "default";
+    document.body.style.userSelect = "";
   }
 
   insertAtCaret(node) {
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) {
       this.noteContent.appendChild(node);
+      
+      // Add line break for proper spacing
+      const br = document.createElement("br");
+      this.noteContent.appendChild(br);
       return;
     }
 
@@ -338,8 +387,13 @@ export class image_upload {
     range.deleteContents();
     range.insertNode(node);
 
-    // Move caret after the image
-    range.setStartAfter(node);
+    // Add a line break after the image 
+    const br = document.createElement("br");
+    range.collapse(false);
+    range.insertNode(br);
+
+    // Move caret after the line break
+    range.setStartAfter(br);
     range.collapse(true);
     selection.removeAllRanges();
     selection.addRange(range);
