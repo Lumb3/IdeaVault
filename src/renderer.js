@@ -1,4 +1,4 @@
-import {TextDecorationToolbar} from "./decoration.js";
+import { TextDecorationToolbar } from "./decoration.js";
 import { image_upload } from "./img_uploader.js";
 const newNoteBtn = document.getElementById("newNoteBtn");
 const deleteBtn = document.getElementById("deleteBtn");
@@ -74,15 +74,15 @@ async function download() {
       <p>Choose a format:</p>
       <div class="format-buttons">
         <button class="format-btn" data-format="txt">
-          <i class="fa-solid fa-file-lines"></i>
+          <i class="bi bi-stickies-fill"></i>
           Text (.txt)
         </button>
         <button class="format-btn" data-format="pdf">
-          <i class="fa-solid fa-file-pdf"></i>
+         <i class="bi bi-file-pdf-fill"></i>
           PDF (.pdf)
         </button>
         <button class="format-btn" data-format="docx">
-          <i class="fa-solid fa-file-word"></i>
+          <i class="bi bi-file-word-fill"></i>
           Word (.docx)
         </button>
       </div>
@@ -96,27 +96,32 @@ async function download() {
     btn.addEventListener("click", async () => {
       const format = btn.dataset.format;
       const originalHTML = btn.innerHTML;
-      
+
       // Show loading state
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
+      btn.innerHTML =
+        '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
       btn.disabled = true;
-      
+
       try {
         await downloadNote(note, format);
         document.body.removeChild(modal);
       } catch (error) {
         console.error("Download failed:", error);
-        alert(`Failed to download as ${format.toUpperCase()}. Error: ${error.message}`);
+        alert(
+          `Failed to download as ${format.toUpperCase()}. Error: ${
+            error.message
+          }`
+        );
         btn.innerHTML = originalHTML;
         btn.disabled = false;
       }
     });
   });
-  
+
   modal.querySelector(".cancel-btn").addEventListener("click", () => {
     document.body.removeChild(modal);
   });
-  
+
   modal.addEventListener("click", (e) => {
     if (e.target === modal) {
       document.body.removeChild(modal);
@@ -126,7 +131,7 @@ async function download() {
 
 async function downloadNote(note, format) {
   const fileName = sanitizeFileName(note.title);
-  
+
   switch (format) {
     case "txt":
       downloadTXT(note, fileName);
@@ -146,8 +151,12 @@ async function downloadNote(note, format) {
 function downloadTXT(note, fileName) {
   const content = `${note.title}\n${"=".repeat(note.title.length)}\n\n${
     note.content
-  }\n\n---\nCreated: ${new Date(note.createdAt).toLocaleString()}\nLast Updated: ${new Date(note.updatedAt).toLocaleString()}`;
-  
+  }\n\n---\nCreated: ${new Date(
+    note.createdAt
+  ).toLocaleString()}\nLast Updated: ${new Date(
+    note.updatedAt
+  ).toLocaleString()}`;
+
   downloadFile(content, `${fileName}.txt`, "text/plain");
 }
 
@@ -180,7 +189,7 @@ function downloadPDF(note, fileName) {
     note.content || "No content",
     maxWidth
   );
-  
+
   contentLines.forEach((line) => {
     if (yPosition > pageHeight - margin) {
       doc.addPage();
@@ -196,13 +205,21 @@ function downloadPDF(note, fileName) {
     doc.addPage();
     yPosition = margin;
   }
-  
+
   doc.setFontSize(9);
   doc.setTextColor(128, 128, 128);
-  doc.text(`Created: ${new Date(note.createdAt).toLocaleString()}`, margin, yPosition);
+  doc.text(
+    `Created: ${new Date(note.createdAt).toLocaleString()}`,
+    margin,
+    yPosition
+  );
   yPosition += 5;
-  doc.text(`Last Updated: ${new Date(note.updatedAt).toLocaleString()}`, margin, yPosition);
-  
+  doc.text(
+    `Last Updated: ${new Date(note.updatedAt).toLocaleString()}`,
+    margin,
+    yPosition
+  );
+
   doc.save(`${fileName}.pdf`);
 }
 
@@ -210,25 +227,25 @@ function downloadPDF(note, fileName) {
 async function downloadDOCX(note, fileName) {
   try {
     console.log("Starting DOCX download for:", note.title);
-    
+
     // Call the main process to generate DOCX
     const bufferArray = await window.authAPI.generateDocx({
       title: note.title,
       content: note.content,
       createdAt: note.createdAt,
-      updatedAt: note.updatedAt
+      updatedAt: note.updatedAt,
     });
-    
+
     console.log("Received buffer array, size:", bufferArray.length);
-    
+
     // Convert array back to Uint8Array
     const buffer = new Uint8Array(bufferArray);
-    
+
     // Create blob and download
     const blob = new Blob([buffer], {
       type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     });
-    
+
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -237,7 +254,7 @@ async function downloadDOCX(note, fileName) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
+
     console.log("DOCX downloaded successfully");
   } catch (error) {
     console.error("Error generating DOCX:", error);
@@ -349,7 +366,7 @@ function selectNote(id) {
 
   if (note) {
     noteTitle.value = note.title;
-    noteContent.innerHTML = note.content || "";  // copy the innerHTML of the textContent
+    noteContent.innerHTML = note.content || ""; // copy the innerHTML of the textContent
     updateWordCount();
 
     document.querySelectorAll(".note-item").forEach((item) => {
@@ -357,7 +374,6 @@ function selectNote(id) {
     });
   }
 }
-
 
 // Handle Note Edit
 function handleNoteEdit() {
@@ -386,7 +402,6 @@ function handleNoteEdit() {
   clearTimeout(saveTimeout);
   saveTimeout = setTimeout(() => saveNotes(), 500);
 }
-
 
 // Render Notes List
 function renderNotesList(filter = "") {

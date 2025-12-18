@@ -571,3 +571,105 @@ body.dark-mode .cancel-btn:hover {
   color: var(--text-primary);
 }
 
+
+/* Add these styles to your styles.css or decoration.css */
+
+/* Image wrapper and controls */
+.image-wrapper {
+  position: relative;
+  display: block;
+  margin: 10px 0;
+  max-width: 100%;
+  user-select: none;
+}
+
+.uploaded-image {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.image-wrapper:hover .uploaded-image {
+  opacity: 0.95;
+}
+
+/* Image toolbar */
+.image-toolbar {
+  animation: toolbarSlideIn 0.2s ease;
+}
+
+@keyframes toolbarSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.toolbar-btn {
+  transition: all 0.2s ease;
+}
+
+.toolbar-btn:active {
+  transform: scale(0.95);
+}
+
+.image-control {
+  transition: all 0.2s ease;
+}
+
+.resize-handle:hover {
+  transform: scale(1.2);
+  background: #b8924d !important;
+}
+
+.delete-btn:hover {
+  transform: scale(1.1);
+  background: #c0392b !important;
+}
+
+/* Prevent text selection during drag/resize */
+body.dragging,
+body.dragging * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+}
+
+/* Dark mode adjustments */
+body.dark-mode .width-label {
+  background: rgba(230, 230, 230, 0.9) !important;
+  color: #2c2c2c !important;
+}
+
+body.dark-mode .image-wrapper {
+  outline-color: #d9985b !important;
+}
+
+/* Ensure images don't break layout */
+.note-content .image-wrapper {
+  max-width: 100%;
+  vertical-align: bottom;
+}
+
+/* Animation for image insertion */
+@keyframes imageInsert {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.image-wrapper {
+  animation: imageInsert 0.3s ease;
+}
