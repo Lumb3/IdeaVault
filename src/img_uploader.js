@@ -19,11 +19,33 @@ export class image_upload {
 
     // Prevent default drag behaviors
     ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
-      this.noteContent.addEventListener(eventName, this.preventDefaults.bind(this), false);
+      this.noteContent.addEventListener(
+        eventName,
+        this.preventDefaults.bind(this),
+        false
+      );
+    });
+
+    this.noteContent.addEventListener("dragenter", (e) => {
+      this.noteContent.style.outline = "2px dashed #00AAFFFF";
+      this.noteContent.style.outlineOffset = "2px";
+      this.noteContent.classList.add("note-drag-hover");
+    });
+
+    this.noteContent.addEventListener("dragover", (e) => {
+      this.noteContent.style.outline = "2px dashed #00AAFFFF";
+      this.noteContent.style.outlineOffset = "2px";
+    });
+
+    this.noteContent.addEventListener("dragleave", (e) => {
+      this.noteContent.style.outline = "none";
     });
 
     // Handle file drop
-    this.noteContent.addEventListener("drop", (e) => this.handleDrop(e));
+    this.noteContent.addEventListener("drop", (e) => {
+      this.noteContent.style.outline = "none";
+      this.handleDrop(e);
+    });
 
     // Handle image clicks to show controls
     this.noteContent.addEventListener("click", (e) => {
@@ -32,7 +54,10 @@ export class image_upload {
         e.target.classList.contains("uploaded-image")
       ) {
         this.selectImage(e.target);
-      } else if (!e.target.closest('.image-toolbar') && !e.target.closest('.resize-handle')) {
+      } else if (
+        !e.target.closest(".image-toolbar") &&
+        !e.target.closest(".resize-handle")
+      ) {
         // Only deselect if clicking outside toolbar and resize handle
         this.deselectImage();
       }
@@ -41,6 +66,22 @@ export class image_upload {
     // Global mouse events for resize
     document.addEventListener("mousemove", (e) => this.handleMouseMove(e));
     document.addEventListener("mouseup", () => this.handleMouseUp());
+    document.addEventListener("keydown", (e) => this.deleteImg(e));
+  }
+  deleteImg(e) {
+    if (!this.activeImage) return;
+
+    if (e.key === "Delete" || e.key === "Backspace") {
+      e.preventDefault();
+      const wrapper = this.activeImage.parentElement;
+      if (wrapper) {
+        wrapper.remove();
+        this.activeImage = null;
+
+        // Trigger save after deletion
+        this.noteContent.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+    }
   }
 
   preventDefaults(e) {
@@ -60,7 +101,7 @@ export class image_upload {
     reader.onload = (event) => {
       const wrapper = this.createImageWrapper(event.target.result);
       this.insertAtCaret(wrapper);
-      
+
       // Trigger save
       this.noteContent.dispatchEvent(new Event("input", { bubbles: true }));
     };
@@ -134,8 +175,10 @@ export class image_upload {
 
   createControls(wrapper) {
     // Remove any existing controls first (in case of re-selection)
-    const existingControls = wrapper.querySelectorAll('.image-toolbar, .image-control');
-    existingControls.forEach(control => control.remove());
+    const existingControls = wrapper.querySelectorAll(
+      ".image-toolbar, .image-control"
+    );
+    existingControls.forEach((control) => control.remove());
 
     // Create toolbar
     const toolbar = document.createElement("div");
@@ -255,7 +298,7 @@ export class image_upload {
       e.stopPropagation();
       wrapper.remove();
       this.activeImage = null;
-      
+
       // Trigger save after deletion
       this.noteContent.dispatchEvent(new Event("input", { bubbles: true }));
     });
@@ -312,14 +355,14 @@ export class image_upload {
   setAlignment(wrapper, align) {
     wrapper.dataset.align = align;
     wrapper.style.textAlign = align;
-    
+
     // Trigger save after alignment change
     this.noteContent.dispatchEvent(new Event("input", { bubbles: true }));
   }
 
   startResize(e) {
     if (!this.activeImage) return;
-    
+
     this.resizing = true;
     this.startX = e.clientX;
     this.startWidth = this.activeImage.offsetWidth;
@@ -331,7 +374,7 @@ export class image_upload {
   handleMouseMove(e) {
     if (this.resizing && this.activeImage) {
       e.preventDefault();
-      
+
       const deltaX = e.clientX - this.startX;
       const newWidth = this.startWidth + deltaX;
       const maxWidth = this.noteContent.offsetWidth;
@@ -361,12 +404,10 @@ export class image_upload {
         wrapper.dataset.width = this.activeImage.style.width;
 
         // Trigger save after resize
-        this.noteContent.dispatchEvent(
-          new Event("input", { bubbles: true })
-        );
+        this.noteContent.dispatchEvent(new Event("input", { bubbles: true }));
       }
     }
-    
+
     this.resizing = false;
     document.body.style.cursor = "default";
     document.body.style.userSelect = "";
@@ -376,7 +417,7 @@ export class image_upload {
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) {
       this.noteContent.appendChild(node);
-      
+
       // Add line break for proper spacing
       const br = document.createElement("br");
       this.noteContent.appendChild(br);
@@ -387,7 +428,7 @@ export class image_upload {
     range.deleteContents();
     range.insertNode(node);
 
-    // Add a line break after the image 
+    // Add a line break after the image
     const br = document.createElement("br");
     range.collapse(false);
     range.insertNode(br);
