@@ -1,5 +1,6 @@
 // main.js
 const { app, BrowserWindow, ipcMain } = require("electron");
+app.commandLine.appendSwitch("enable-speech-input");
 const path = require("path");
 const bcrypt = require("bcryptjs");
 const { Pool } = require("pg");

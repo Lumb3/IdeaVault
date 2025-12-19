@@ -1,6 +1,7 @@
 // renderer.js
 import { TextDecorationToolbar } from "./decoration.js";
 import { image_upload } from "./img_uploader.js";
+import { SpeechToText } from "./speech_to_text.js";
 const newNoteBtn = document.getElementById("newNoteBtn");
 const deleteBtn = document.getElementById("deleteBtn");
 const notesList = document.getElementById("notesList");
@@ -12,6 +13,8 @@ const lastSaved = document.getElementById("lastSaved");
 const toggle = document.querySelector(".toggle-wrap");
 const darkMode = document.getElementById("darkModeLink");
 const download_note = document.querySelector(".download-btn");
+const speechBtn = document.querySelector(".speech-to-text-btn");
+const speechIcon = document.querySelector("#speechIcon");
 
 // Toggle dark or light mode
 const userTheme = localStorage.getItem("theme");
@@ -24,13 +27,18 @@ if (userTheme == "dark") {
 let notes = [];
 let currentNoteId = null;
 let saveTimeout = null;
-
+let speech = null;
 // Initialize
 document.addEventListener("DOMContentLoaded", () => {
   loadNotes();
   setupEventListeners();
   new TextDecorationToolbar();
   new image_upload();
+  speech = new SpeechToText(noteContent);
+  if (!speech || !speech.recognition) {
+    speechBtn.style.display = "none";
+    console.log("Speech recognition not available");
+  }
 });
 
 // Setup Event Listeners
@@ -44,6 +52,23 @@ function setupEventListeners() {
   document.querySelector(".reset-btn").addEventListener("click", exit);
   download_note.addEventListener("click", download);
   toggle.addEventListener("click", toggleDarkMode);
+  speechBtn.addEventListener("click", speechToggle);
+}
+function speechToggle() {
+  if (!speech || !speech.recognition) {
+    console.error("Speech recognition is not available");
+    return;
+  }
+  speech.toggle();
+  if (speech.is_Recording()) {
+    speechIcon.classList.remove("fa-comment-dots");
+    speechIcon.classList.add("fa-microphone");
+    speechIcon.classList.add("recording");
+  } else {
+    speechIcon.classList.remove("fa-microphone");
+    speechBtn.classList.remove("recording");
+    speechIcon.classList.add("fa-comment-dots");
+  }
 }
 
 function toggleDarkMode() {
@@ -404,13 +429,12 @@ function selectNote(id) {
 function cleanEditorHTML() {
   const clone = noteContent.cloneNode(true);
 
-  clone.querySelectorAll(
-    ".image-toolbar, .resize-handle, .width-label"
-  ).forEach(el => el.remove());
+  clone
+    .querySelectorAll(".image-toolbar, .resize-handle, .width-label")
+    .forEach((el) => el.remove());
 
   return clone.innerHTML;
 }
-
 
 // Handle Note Edit
 function handleNoteEdit() {

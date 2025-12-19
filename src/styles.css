@@ -164,7 +164,8 @@ body {
   display: flex;
   flex-direction: column;
   background: var(--bg-primary);
-  min-height: 0;
+  min-height: 0; 
+  overflow: hidden; 
 }
 
 
@@ -421,9 +422,43 @@ body.dark-mode .cancel-btn:hover {
   color: var(--accent-hover) !important;
 }
 
+.speech-to-text-btn {
+  width: 38px;
+  height: 38px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.speech-to-text-btn:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--accent-color);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-light);
+}
+
+.speech-to-text-btn:active {
+  transform: translateY(0);
+}
+
+.speech-to-text-btn i {
+  font-size: 18px;
+  color: var(--accent-color) !important;
+  transition: color 0.2s ease;
+}
+
+.speech-to-text-btn:hover i {
+  color: var(--accent-hover) !important;
+}
+
 .note-content {
   flex: 1;
-  min-height: 0;       
+  min-height: 0; 
   padding: 36px 44px;
   background: #fffdf7;
   border: 1px solid #e7e2d4;
@@ -438,7 +473,8 @@ body.dark-mode .cancel-btn:hover {
   resize: none;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
   caret-color: #c29553;
-  overflow-y: auto;
+  overflow-y: auto; /* Allow vertical scrolling */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 
