@@ -35,10 +35,10 @@ Electron.js • PostgreSQL • bcrypt.js • Node.js
 
 ## 🚀 Quick Start
 
-1. Launch the app and login with provided credentials
-2. Click "+" to create notes
-3. Save with Cmd+S or the save button
-4. Always use the exit button to ensure data is saved
+1. Launch the app and log in using the provided credentials  
+2. Click **+** to create a new note  
+3. Select a note to format it with **bold**, *italic*, <u>underline</u>, or highlighter  
+4. Use the **Exit** button to ensure your data is saved properly  
 
 ---
 

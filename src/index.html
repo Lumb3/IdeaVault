@@ -14,6 +14,10 @@
       referrerpolicy="no-referrer"
     />
     <link id="darkModeLink" rel="stylesheet" href="darkmode.css" disabled />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
   </head>
   <body>
     <div class="app-container">
@@ -60,10 +64,19 @@
             placeholder="Untitled"
           />
           <div class="editor-actions">
+            <!--Text-to-Speech AI-->
+            <button class="speech-to-text-btn" title="Text to Speech">
+              <i
+                id="speechIcon"
+                class="fa-solid fa-comment-dots"
+                style="color: #d9985b"
+              ></i>
+            </button>
             <!--Download Note-->
             <button class="download-btn" title="Download note">
               <i class="fa-solid fa-download" style="color: #d9985b"> </i>
             </button>
+            
             <!-- Reset button -->
             <button class="reset-btn" title="Reset note">
               <i class="fa-solid fa-power-off" style="color: #d9985b"></i>

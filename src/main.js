@@ -1,9 +1,114 @@
 // main.js
 const { app, BrowserWindow, ipcMain } = require("electron");
+app.commandLine.appendSwitch("enable-speech-input");
 const path = require("path");
 const bcrypt = require("bcryptjs");
 const { Pool } = require("pg");
-const { Document, Packer, Paragraph, TextRun, HeadingLevel, BorderStyle } = require("docx");
+const {
+  Document,
+  Packer,
+  Paragraph,
+  TextRun,
+  HeadingLevel,
+  BorderStyle,
+} = require("docx");
+const { spawn } = require("child_process");
+
+let speechProcess = null;
+let mainWindow = null;
+
+// Start speech recognition service
+// Replace your startSpeechService function in main.js:
+
+function startSpeechService() {
+  if (speechProcess) {
+    console.log("Speech service already running");
+    return;
+  }
+
+  console.log("Starting speech service...");
+
+  const speechBinaryPath = path.join(__dirname, "..", "dist", "speech_service");
+  console.log("Binary path:", speechBinaryPath);
+
+  // Spawn the speech engine
+  speechProcess = spawn(speechBinaryPath, [], {
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+
+  console.log("Speech process spawned, PID:", speechProcess.pid);
+
+  // Listen for output
+  speechProcess.stdout.on("data", (data) => {
+    const output = data.toString().trim();
+    console.log("RAW STDOUT:", output);
+
+    // Final recognized text
+    if (output.startsWith("Text: ")) {
+      const text = output.replace("Text:", "").trim();
+      console.log("Sending FINAL text to renderer:", text);
+      
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send("speech-final", text);
+        console.log("Final text sent successfully");
+      } else {
+        console.error("mainWindow not available!");
+      }
+    }
+
+    // Partial recognized text
+    if (output.startsWith("Partial: ")) {
+      const partial = output.replace("Partial:", "").trim();
+      console.log("⚡ Sending PARTIAL text to renderer:", partial);
+      
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send("speech-partial", partial);
+        console.log("Partial text sent successfully");
+      } else {
+        console.error("mainWindow not available!");
+      }
+    }
+  });
+
+  // Listen for errors
+  speechProcess.stderr.on("data", (data) => {
+    const errMsg = data.toString();
+    console.log("Speech service stderr:", errMsg);
+  });
+
+  // Handle exit
+  speechProcess.on("close", (code) => {
+    console.log("Speech service stopped with code", code);
+    speechProcess = null;
+  });
+  
+  speechProcess.on("error", (error) => {
+    console.error("Speech process error:", error);
+    speechProcess = null;
+  });
+}
+
+
+// Stop speech recognition service
+function stopSpeechService() {
+  if (speechProcess) {
+    console.log("Stopping speech service...");
+    speechProcess.kill();
+    speechProcess = null;
+  }
+}
+
+ipcMain.handle("start-speech-service", async () => {
+  console.log("IPC start-speech-service called");
+  startSpeechService();
+  return { success: true };
+});
+
+ipcMain.handle("stop-speech-service", async () => {
+  console.log("IPC: stop-speech-service called");
+  stopSpeechService();
+  return { success: true };
+});
 
 // PostgreSQL pool setup
 const pool = new Pool({
@@ -53,7 +158,7 @@ function registerIPCHandlers() {
     try {
       console.log("Generating DOCX for note:", noteData.title);
       const { title, content, createdAt, updatedAt } = noteData;
-      
+
       // Split content into paragraphs
       const contentParagraphs = content.split("\n").map(
         (line) =>
@@ -124,7 +229,9 @@ function registerIPCHandlers() {
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: `Last Updated: ${new Date(updatedAt).toLocaleString()}`,
+                    text: `Last Updated: ${new Date(
+                      updatedAt
+                    ).toLocaleString()}`,
                     size: 18,
                     color: "808080",
                   }),
@@ -264,11 +371,11 @@ function registerIPCHandlers() {
 
 // Create Electron window
 function createWindow() {
-  const win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 900,
     height: 650,
     title: "IdeaVault",
-    icon: path.join(__dirname, "assets", "icon.png"),
+    icon: path.join(__dirname, "assets", "icon.icns"),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -276,7 +383,9 @@ function createWindow() {
     },
   });
 
-  win.loadFile(path.join(__dirname, "login.html"));
+  mainWindow.loadFile(path.join(__dirname, "login.html"));
+
+  console.log("mainWindow created and assigned to global variable");
 }
 
 // App lifecycle
@@ -290,6 +399,7 @@ app.whenReady().then(async () => {
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
+    stopSpeechService();
     pool
       .end()
       .then(() => console.log("Database connection closed."))
@@ -297,5 +407,15 @@ app.on("window-all-closed", () => {
         console.error("Error closing database connection:", error)
       );
     app.quit();
+  }
+});
+
+app.on("before-quit", () => {
+  stopSpeechService();
+});
+
+app.on("activate", () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
   }
 });

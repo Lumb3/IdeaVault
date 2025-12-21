@@ -2,42 +2,103 @@
   "name": "IdeaVault",
   "version": "1.0.0",
   "productName": "IdeaVault",
-  "description": "A desktop note and idea management app built with Electron.",
+  "description": "A desktop note and idea management app with voice-to-text capabilities",
   "main": "src/main.js",
+  "author": "Erik",
+  "license": "MIT",
   "scripts": {
     "start": "electron .",
-    "build:mac": "electron-packager . IdeaVault --platform=darwin --arch=x64 --icon=/Users/erkhembilegariunbold/Desktop/IdeaVault/assets/icon.icns --overwrite",
-    "build:win": "electron-packager . IdeaVault --platform=win32 --arch=x64 --icon=assets/icon.ico --overwrite",
-    "build": "electron-builder"
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
+    "build:all": "electron-builder --mac --win",
+    "rebuild:speech": "pyinstaller speech_service.spec"
   },
   "devDependencies": {
     "electron": "^39.2.0",
-    "electron-builder": "^26.0.12",
-    "electron-packager": "^17.1.2"
+    "electron-builder": "^26.0.12"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.84.0",
     "bcryptjs": "^3.0.3",
     "docx": "^9.5.1",
-    "node": "^20.19.6",
     "pg": "^8.16.3"
   },
   "build": {
     "appId": "com.erik.ideavault",
     "productName": "IdeaVault",
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "dist/speech_service",
+        "to": "backend/speech_service",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "directories": {
+      "output": "release",
+      "buildResources": "assets"
+    },
     "mac": {
       "target": [
-        "dmg",
-        "zip"
+        {
+          "target": "dmg",
+          "arch": ["arm64", "x64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["arm64", "x64"]
+        }
       ],
-      "icon": "/Users/erkhembilegariunbold/Desktop/IdeaVault/assets/icon.icns"
+      "icon": "assets/icon.icns",
+      "category": "public.app-category.productivity",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist"
     },
     "win": {
       "target": [
-        "nsis",
-        "zip"
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["x64"]
+        }
       ],
       "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ],
+      "window": {
+        "width": 540,
+        "height": 380
+      }
     }
   }
 }
