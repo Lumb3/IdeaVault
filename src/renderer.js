@@ -30,15 +30,11 @@ let saveTimeout = null;
 let speech = null;
 // Initialize
 document.addEventListener("DOMContentLoaded", () => {
+  //speech = new SpeechToText(noteContent);
   loadNotes();
   setupEventListeners();
   new TextDecorationToolbar();
   new image_upload();
-  speech = new SpeechToText(noteContent);
-  if (!speech || !speech.recognition) {
-    speechBtn.style.display = "none";
-    console.log("Speech recognition not available");
-  }
 });
 
 // Setup Event Listeners
@@ -52,24 +48,32 @@ function setupEventListeners() {
   document.querySelector(".reset-btn").addEventListener("click", exit);
   download_note.addEventListener("click", download);
   toggle.addEventListener("click", toggleDarkMode);
-  speechBtn.addEventListener("click", speechToggle);
+  //speechBtn.addEventListener("click", speechToggle);
 }
 function speechToggle() {
-  if (!speech || !speech.recognition) {
-    console.error("Speech recognition is not available");
+  if (!speech) {
+    console.warn("speech object not found. Error");
     return;
   }
-  speech.toggle();
-  if (speech.is_Recording()) {
-    speechIcon.classList.remove("fa-comment-dots");
-    speechIcon.classList.add("fa-microphone");
-    speechIcon.classList.add("recording");
-  } else {
-    speechIcon.classList.remove("fa-microphone");
-    speechBtn.classList.remove("recording");
-    speechIcon.classList.add("fa-comment-dots");
-  }
+  console.log("Reached here");
+  speech.start();
 }
+// function speechToggle() {
+//   if (!speech || !speech.recognition) {
+//     console.error("Speech recognition is not available");
+//     return;
+//   }
+//   speech.toggle();
+//   if (speech.is_Recording()) {
+//     speechIcon.classList.remove("fa-comment-dots");
+//     speechIcon.classList.add("fa-microphone");
+//     speechIcon.classList.add("recording");
+//   } else {
+//     speechIcon.classList.remove("fa-microphone");
+//     speechBtn.classList.remove("recording");
+//     speechIcon.classList.add("fa-comment-dots");
+//   }
+// }
 
 function toggleDarkMode() {
   if (darkMode.disabled) {

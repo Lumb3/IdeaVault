@@ -40,7 +40,7 @@ exe = EXE(
     a.datas,
     [],
     name='speech_service',
-    debug=False
+    debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=False,  # Disable UPX for safety with dynamic libraries

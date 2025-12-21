@@ -1,106 +1,74 @@
 export class SpeechToText {
-  constructor(noteContentEl) {
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      console.log("Speech Recognition is not supported in this browser.");
-      return;
-    }
-
-    this.recognition = new SpeechRecognition();
-    this.noteContent = noteContentEl;
+  constructor(noteContent) {
+    this.noteContent = noteContent;
     this.isRecording = false;
-    this.shouldRestart = false; 
+    this.partialText = "";
 
-    this.recognition.continuous = true;
-    this.recognition.interimResults = true;
-    this.recognition.lang = "en-US";
-
-    this.finalTxt = "";
-
-    this.recognition.onresult = (event) => {
-      let interimTxt = "";
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-
-        if (event.results[i].isFinal) {
-          this.finalTxt += transcript + " ";
-        } else {
-          interimTxt += transcript;
-        }
-      }
-
-      // Update content without replacing existing text
-      const currentText = this.noteContent.innerText.replace(/\s*$/, "");
-      this.noteContent.innerText = currentText + this.finalTxt + interimTxt;
-    };
-
-    this.recognition.onstart = () => {
-      this.isRecording = true;
-      console.log("Speech recognition started");
-    };
-
-    this.recognition.onend = () => {
-      this.isRecording = false;
-      console.log("Speech recognition ended");
-      
-      // Only restart if the user wants to continue recording
-      if (this.shouldRestart) {
-        setTimeout(() => {
-          try {
-            this.recognition.start();
-          } catch (error) {
-            console.error("Failed to restart recognition:", error);
-            this.shouldRestart = false;
-          }
-        }, 100); // Small delay before restarting
-      }
-    };
-
-    this.recognition.onerror = (e) => {
-      console.log("Speech recognition error:", e.error);
-      
-      if (e.error === "network") {
-        console.warn("Network error - speech service disconnected");
-        // Don't automatically restart on network errors
-        this.shouldRestart = false;
-        this.recognition.stop();
-      } else if (e.error === "aborted") {
-        // Normal stop, don't log as error
-        this.shouldRestart = false;
-      } else if (e.error === "no-speech") {
-        console.log("No speech detected, continuing...");
-        // Continue listening if no speech was detected
-      } else {
-        console.error("Recognition error:", e.error);
-        this.shouldRestart = false;
-      }
-    };
+    // Setup listeners ONCE in constructor
+    this.setupListeners();
   }
 
-  start() {
-    if (this.isRecording) return;
-    this.finalTxt = "";
-    this.shouldRestart = true; // Set restart flag when starting
+  setupListeners() {
+    console.log("Setting up speech listeners...");
+
+    // Handle final recognized text
+    window.authAPI.onSpeechRecognized((text) => {
+      console.log("✅ RECOGNIZED (final):", text);
+      // Optionally insert text even if not "recording"
+      // if you want to see it work immediately
+      if (text) {
+        this.insertText(text);
+      }
+    });
+
+    // Handle partial results
+    window.authAPI.onSpeechPartial((text) => {
+      console.log("🔄 PARTIAL:", text);
+      this.partialText = text;
+    });
+  }
+
+  async start() {
     try {
-      this.recognition.start();
+      console.log("🎤 Starting speech recognition...");
+      await window.authAPI.startSpeechService();
+      this.isRecording = true;
+      console.log("✅ Speech recognition started - listening continuously");
     } catch (error) {
-      console.error("Failed to start recognition:", error);
-      this.shouldRestart = false;
+      console.error("❌ Failed to start speech recognition:", error);
+      this.isRecording = false;
     }
   }
 
-  stop() {
-    if (!this.isRecording) return;
-    this.shouldRestart = false; // Clear restart flag when stopping
-    this.recognition.stop();
-  }
-
-  toggle() {
-    this.isRecording ? this.stop() : this.start();
+  async stop() {
+    try {
+      console.log("🛑 Stopping speech recognition...");
+      await window.authAPI.stopSpeechService();
+      this.isRecording = false;
+      this.partialText = "";
+      console.log("✅ Speech recognition stopped");
+    } catch (error) {
+      console.error("❌ Failed to stop speech recognition:", error);
+    }
   }
 
   is_Recording() {
     return this.isRecording;
+  }
+
+  insertText(text) {
+    console.log("📝 Inserting text:", text);
+    // Your text insertion logic here
+    if (this.noteContent) {
+      // Example: append to content
+      const currentText = this.noteContent.innerText || "";
+      this.noteContent.innerText = currentText + " " + text;
+    }
+  }
+
+  async terminal_output() {
+    // For debugging - starts service and logs output
+    await this.start();
+    console.log("🖥️ Terminal output mode enabled - watch console for speech");
   }
 }

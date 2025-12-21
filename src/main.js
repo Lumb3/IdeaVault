@@ -4,7 +4,44 @@ app.commandLine.appendSwitch("enable-speech-input");
 const path = require("path");
 const bcrypt = require("bcryptjs");
 const { Pool } = require("pg");
-const { Document, Packer, Paragraph, TextRun, HeadingLevel, BorderStyle } = require("docx");
+const {
+  Document,
+  Packer,
+  Paragraph,
+  TextRun,
+  HeadingLevel,
+  BorderStyle,
+} = require("docx");
+const { spawn } = require("child_process");
+
+let speechProcess = null;
+let mainWindow = null; 
+
+// Start speech recognition service
+function startSpeechService() {
+  // Complete this function
+}
+
+// Stop speech recognition service
+function stopSpeechService() {
+  if (speechProcess) {
+    console.log("Stopping speech service...");
+    speechProcess.kill();
+    speechProcess = null;
+  }
+}
+
+ipcMain.handle("start-speech-service", async () => {
+  console.log("IPC start-speech-service called");
+  startSpeechService();
+  return { success: true };
+});
+
+ipcMain.handle("stop-speech-service", async () => {
+  console.log("🛑 IPC: stop-speech-service called");
+  stopSpeechService();
+  return { success: true };
+});
 
 // PostgreSQL pool setup
 const pool = new Pool({
@@ -54,7 +91,7 @@ function registerIPCHandlers() {
     try {
       console.log("Generating DOCX for note:", noteData.title);
       const { title, content, createdAt, updatedAt } = noteData;
-      
+
       // Split content into paragraphs
       const contentParagraphs = content.split("\n").map(
         (line) =>
@@ -125,7 +162,9 @@ function registerIPCHandlers() {
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: `Last Updated: ${new Date(updatedAt).toLocaleString()}`,
+                    text: `Last Updated: ${new Date(
+                      updatedAt
+                    ).toLocaleString()}`,
                     size: 18,
                     color: "808080",
                   }),
@@ -265,7 +304,8 @@ function registerIPCHandlers() {
 
 // Create Electron window
 function createWindow() {
-  const win = new BrowserWindow({
+  // ⚠️ REMOVE 'const' - we want to assign to the GLOBAL mainWindow
+  mainWindow = new BrowserWindow({
     width: 900,
     height: 650,
     title: "IdeaVault",
@@ -277,7 +317,9 @@ function createWindow() {
     },
   });
 
-  win.loadFile(path.join(__dirname, "login.html"));
+  mainWindow.loadFile(path.join(__dirname, "login.html"));
+  
+  console.log("✅ mainWindow created and assigned to global variable");
 }
 
 // App lifecycle
@@ -291,6 +333,7 @@ app.whenReady().then(async () => {
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
+    stopSpeechService();
     pool
       .end()
       .then(() => console.log("Database connection closed."))
@@ -298,5 +341,15 @@ app.on("window-all-closed", () => {
         console.error("Error closing database connection:", error)
       );
     app.quit();
+  }
+});
+
+app.on("before-quit", () => {
+  stopSpeechService();
+});
+
+app.on("activate", () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
   }
 });

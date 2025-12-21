@@ -49,5 +49,29 @@ contextBridge.exposeInMainWorld("authAPI", {
       console.error("Error generating DOCX:", error);
       throw error;
     }
-  }
+  },
+
+  // Speech service controls
+  startSpeechService: () => ipcRenderer.invoke("start-speech-service"),
+  stopSpeechService: () => ipcRenderer.invoke("stop-speech-service"),
+
+  // Speech recognition events - use removeListener pattern
+  onSpeechRecognized: (callback) => {
+    // Remove any existing listeners first
+    ipcRenderer.removeAllListeners("speech-recognized");
+    // Add new listener
+    ipcRenderer.on("speech-recognized", (event, text) => callback(text));
+  },
+  onSpeechPartial: (callback) => {
+    // Remove any existing listeners first
+    ipcRenderer.removeAllListeners("speech-partial");
+    // Add new listener
+    ipcRenderer.on("speech-partial", (event, text) => callback(text));
+  },
+
+  // Clean up listeners
+  removeAllSpeechListeners: () => {
+    ipcRenderer.removeAllListeners("speech-recognized");
+    ipcRenderer.removeAllListeners("speech-partial");
+  },
 });
