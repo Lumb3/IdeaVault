@@ -269,7 +269,7 @@ function createWindow() {
     width: 900,
     height: 650,
     title: "IdeaVault",
-    icon: path.join(__dirname, "assets", "icon.png"),
+    icon: path.join(__dirname, "assets", "icon.icns"),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,

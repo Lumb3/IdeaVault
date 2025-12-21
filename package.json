@@ -6,7 +6,7 @@
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
-    "build:mac": "electron-packager . IdeaVault --platform=darwin --arch=x64 --icon=/Users/erkhembilegariunbold/Desktop/IdeaVault/assets/icon.icns --overwrite",
+    "build:mac": "electron-packager . IdeaVault --platform=darwin --arch=x64 --icon=assets/icon.icns --overwrite",
     "build:win": "electron-packager . IdeaVault --platform=win32 --arch=x64 --icon=assets/icon.ico --overwrite",
     "build": "electron-builder"
   },
@@ -25,12 +25,18 @@
   "build": {
     "appId": "com.erik.ideavault",
     "productName": "IdeaVault",
+    "extraResources": [
+      {
+        "from": "backend/dist",
+        "to": "backend"
+      }
+    ],
     "mac": {
       "target": [
         "dmg",
         "zip"
       ],
-      "icon": "/Users/erkhembilegariunbold/Desktop/IdeaVault/assets/icon.icns"
+      "icon": "assets/icon.icns"
     },
     "win": {
       "target": [
