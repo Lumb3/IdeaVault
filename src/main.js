@@ -371,7 +371,6 @@ function registerIPCHandlers() {
 
 // Create Electron window
 function createWindow() {
-  // ⚠️ REMOVE 'const' - we want to assign to the GLOBAL mainWindow
   mainWindow = new BrowserWindow({
     width: 900,
     height: 650,
@@ -386,7 +385,7 @@ function createWindow() {
 
   mainWindow.loadFile(path.join(__dirname, "login.html"));
 
-  console.log("✅ mainWindow created and assigned to global variable");
+  console.log("mainWindow created and assigned to global variable");
 }
 
 // App lifecycle

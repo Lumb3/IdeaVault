@@ -1,7 +1,7 @@
 // renderer.js
 import { TextDecorationToolbar } from "./decoration.js";
 import { image_upload } from "./img_uploader.js";
-import { SpeechToText } from "./speech_to_text.js";
+import { speechToggle } from "./speech_to_text.js";
 const newNoteBtn = document.getElementById("newNoteBtn");
 const deleteBtn = document.getElementById("deleteBtn");
 const notesList = document.getElementById("notesList");
@@ -14,7 +14,6 @@ const toggle = document.querySelector(".toggle-wrap");
 const darkMode = document.getElementById("darkModeLink");
 const download_note = document.querySelector(".download-btn");
 const speechBtn = document.querySelector(".speech-to-text-btn");
-const speechIcon = document.querySelector("#speechIcon");
 
 // Toggle dark or light mode
 const userTheme = localStorage.getItem("theme");
@@ -27,11 +26,10 @@ if (userTheme == "dark") {
 let notes = [];
 let currentNoteId = null;
 let saveTimeout = null;
-let speech = null;
-let speechActive = false;
+
+
 // Initialize
 document.addEventListener("DOMContentLoaded", () => {
-  //speech = new SpeechToText(noteContent);
   loadNotes();
   setupEventListeners();
   new TextDecorationToolbar();
@@ -49,69 +47,7 @@ function setupEventListeners() {
   document.querySelector(".reset-btn").addEventListener("click", exit);
   download_note.addEventListener("click", download);
   toggle.addEventListener("click", toggleDarkMode);
-  speechBtn.addEventListener("click", speechToggle);
-}
-// Replace your speechToggle function with this debug version:
-
-function speechToggle() {
-  console.log("=== speechToggle called ===");
-  console.log("Current speechActive state:", speechActive);
-
-  if (!speechActive) {
-    console.log("Starting speech service...");
-
-    try {
-      window.authAPI.startSpeechService();
-      speechActive = true;
-      console.log("Speech service start command sent");
-
-      // Set up final text listener
-      console.log("Setting up onSpeechFinal listener...");
-      window.authAPI.onSpeechFinal((text) => {
-        console.log("FINAL TEXT RECEIVED:", text);
-        console.log("Text type:", typeof text);
-        console.log("Text length:", text ? text.length : 0);
-      });
-
-      // Set up partial text listener
-      console.log("Setting up onSpeechPartial listener...");
-      window.authAPI.onSpeechPartial((partial) => {
-        console.log("PARTIAL TEXT RECEIVED:", partial);
-        console.log("Partial type:", typeof partial);
-        console.log("Partial length:", partial ? partial.length : 0);
-      });
-
-      console.log("All listeners set up successfully");
-
-      // Update UI
-      speechIcon.classList.remove("fa-comment-dots");
-      speechIcon.classList.add("fa-microphone");
-      speechBtn.classList.add("recording");
-      console.log("UI updated to recording state");
-    } catch (error) {
-      console.error("Error starting speech service:", error);
-      speechActive = false;
-    }
-  } else {
-    console.log("Stopping speech service...");
-
-    try {
-      window.authAPI.stopSpeechService();
-      window.authAPI.removeAllSpeechListeners();
-      speechActive = false;
-      console.log("Speech service stopped");
-
-      // Update UI
-      speechIcon.classList.remove("fa-microphone");
-      speechBtn.classList.remove("recording");
-      speechIcon.classList.add("fa-comment-dots");
-      console.log("UI updated to stopped state");
-    } catch (error) {
-      console.error("Error stopping speech service:", error);
-    }
-  }
-
-  console.log("=== speechToggle finished ===\n");
+  speechBtn.addEventListener("click", () => speechToggle(noteContent, speechBtn));
 }
 
 function toggleDarkMode() {
