@@ -15,12 +15,79 @@ const {
 const { spawn } = require("child_process");
 
 let speechProcess = null;
-let mainWindow = null; 
+let mainWindow = null;
 
 // Start speech recognition service
+// Replace your startSpeechService function in main.js:
+
 function startSpeechService() {
-  // Complete this function
+  if (speechProcess) {
+    console.log("Speech service already running");
+    return;
+  }
+
+  console.log("Starting speech service...");
+
+  const speechBinaryPath = path.join(__dirname, "..", "dist", "speech_service");
+  console.log("Binary path:", speechBinaryPath);
+
+  // Spawn the speech engine
+  speechProcess = spawn(speechBinaryPath, [], {
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+
+  console.log("Speech process spawned, PID:", speechProcess.pid);
+
+  // Listen for output
+  speechProcess.stdout.on("data", (data) => {
+    const output = data.toString().trim();
+    console.log("RAW STDOUT:", output);
+
+    // Final recognized text
+    if (output.startsWith("Text: ")) {
+      const text = output.replace("Text:", "").trim();
+      console.log("Sending FINAL text to renderer:", text);
+      
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send("speech-final", text);
+        console.log("Final text sent successfully");
+      } else {
+        console.error("mainWindow not available!");
+      }
+    }
+
+    // Partial recognized text
+    if (output.startsWith("Partial: ")) {
+      const partial = output.replace("Partial:", "").trim();
+      console.log("⚡ Sending PARTIAL text to renderer:", partial);
+      
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send("speech-partial", partial);
+        console.log("Partial text sent successfully");
+      } else {
+        console.error("mainWindow not available!");
+      }
+    }
+  });
+
+  // Listen for errors
+  speechProcess.stderr.on("data", (data) => {
+    const errMsg = data.toString();
+    console.log("Speech service stderr:", errMsg);
+  });
+
+  // Handle exit
+  speechProcess.on("close", (code) => {
+    console.log("Speech service stopped with code", code);
+    speechProcess = null;
+  });
+  
+  speechProcess.on("error", (error) => {
+    console.error("Speech process error:", error);
+    speechProcess = null;
+  });
 }
+
 
 // Stop speech recognition service
 function stopSpeechService() {
@@ -38,7 +105,7 @@ ipcMain.handle("start-speech-service", async () => {
 });
 
 ipcMain.handle("stop-speech-service", async () => {
-  console.log("🛑 IPC: stop-speech-service called");
+  console.log("IPC: stop-speech-service called");
   stopSpeechService();
   return { success: true };
 });
@@ -318,7 +385,7 @@ function createWindow() {
   });
 
   mainWindow.loadFile(path.join(__dirname, "login.html"));
-  
+
   console.log("✅ mainWindow created and assigned to global variable");
 }
 

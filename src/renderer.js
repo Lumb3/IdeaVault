@@ -28,6 +28,7 @@ let notes = [];
 let currentNoteId = null;
 let saveTimeout = null;
 let speech = null;
+let speechActive = false;
 // Initialize
 document.addEventListener("DOMContentLoaded", () => {
   //speech = new SpeechToText(noteContent);
@@ -48,32 +49,70 @@ function setupEventListeners() {
   document.querySelector(".reset-btn").addEventListener("click", exit);
   download_note.addEventListener("click", download);
   toggle.addEventListener("click", toggleDarkMode);
-  //speechBtn.addEventListener("click", speechToggle);
+  speechBtn.addEventListener("click", speechToggle);
 }
+// Replace your speechToggle function with this debug version:
+
 function speechToggle() {
-  if (!speech) {
-    console.warn("speech object not found. Error");
-    return;
+  console.log("=== speechToggle called ===");
+  console.log("Current speechActive state:", speechActive);
+
+  if (!speechActive) {
+    console.log("Starting speech service...");
+
+    try {
+      window.authAPI.startSpeechService();
+      speechActive = true;
+      console.log("Speech service start command sent");
+
+      // Set up final text listener
+      console.log("Setting up onSpeechFinal listener...");
+      window.authAPI.onSpeechFinal((text) => {
+        console.log("FINAL TEXT RECEIVED:", text);
+        console.log("Text type:", typeof text);
+        console.log("Text length:", text ? text.length : 0);
+      });
+
+      // Set up partial text listener
+      console.log("Setting up onSpeechPartial listener...");
+      window.authAPI.onSpeechPartial((partial) => {
+        console.log("PARTIAL TEXT RECEIVED:", partial);
+        console.log("Partial type:", typeof partial);
+        console.log("Partial length:", partial ? partial.length : 0);
+      });
+
+      console.log("All listeners set up successfully");
+
+      // Update UI
+      speechIcon.classList.remove("fa-comment-dots");
+      speechIcon.classList.add("fa-microphone");
+      speechBtn.classList.add("recording");
+      console.log("UI updated to recording state");
+    } catch (error) {
+      console.error("Error starting speech service:", error);
+      speechActive = false;
+    }
+  } else {
+    console.log("Stopping speech service...");
+
+    try {
+      window.authAPI.stopSpeechService();
+      window.authAPI.removeAllSpeechListeners();
+      speechActive = false;
+      console.log("Speech service stopped");
+
+      // Update UI
+      speechIcon.classList.remove("fa-microphone");
+      speechBtn.classList.remove("recording");
+      speechIcon.classList.add("fa-comment-dots");
+      console.log("UI updated to stopped state");
+    } catch (error) {
+      console.error("Error stopping speech service:", error);
+    }
   }
-  console.log("Reached here");
-  speech.start();
+
+  console.log("=== speechToggle finished ===\n");
 }
-// function speechToggle() {
-//   if (!speech || !speech.recognition) {
-//     console.error("Speech recognition is not available");
-//     return;
-//   }
-//   speech.toggle();
-//   if (speech.is_Recording()) {
-//     speechIcon.classList.remove("fa-comment-dots");
-//     speechIcon.classList.add("fa-microphone");
-//     speechIcon.classList.add("recording");
-//   } else {
-//     speechIcon.classList.remove("fa-microphone");
-//     speechBtn.classList.remove("recording");
-//     speechIcon.classList.add("fa-comment-dots");
-//   }
-// }
 
 function toggleDarkMode() {
   if (darkMode.disabled) {

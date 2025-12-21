@@ -34,11 +34,14 @@ try:
         data = stream.read(8192, exception_on_overflow=False)
         if recognizer.AcceptWaveform(data):
             result = json.loads(recognizer.Result())
-            print("Text: ", result["text"])
+            if result["text"]:
+                # Print to stdout with no extra spaces, flush immediately
+                print(f"Text: {result['text']}", flush=True)
         else:
             partial = json.loads(recognizer.PartialResult())
             if partial['partial']:
-                print("Partial: ", partial["partial"])
+                # Print to stdout with no extra spaces, flush immediately
+                print(f"Partial: {partial['partial']}", flush=True)
 except KeyboardInterrupt:
     print("\nStopping...")
 finally:
