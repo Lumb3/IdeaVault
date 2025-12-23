@@ -1,11 +1,11 @@
-# 💡 IdeaVault
+#     IdeaVault
 
 Welcome to **IdeaVault v2.0.0**!  
 ---
 A simple desktop app for organizing notes and securely storing personal information. Future versions will support multiple users.
 
 
-## ✨ Features
+##   Features
 
 - **Secure Login** with bcrypt password hashing
 - **Auto-Save** to prevent data loss
@@ -14,7 +14,7 @@ A simple desktop app for organizing notes and securely storing personal informat
 
 ---
 
-## 🛠️ Tech Stack
+##   Tech Stack
 
 Electron.js • PostgreSQL • bcrypt.js • Node.js
 
@@ -27,13 +27,13 @@ Electron.js • PostgreSQL • bcrypt.js • Node.js
 
 1. Download **v2.0.0** from [Releases](https://github.com/Lumb3/IdeaVault/releases/tag/second_release)
 2. Extract `IdeaVault.zip` and open the `mac-arm64` folder
-3. Double-click **IdeaVault** to launch
+3. Double-click **IdeaVault** to launch 
 
-> **macOS Note:** First-time users may need to right-click → "Open" to bypass Gatekeeper.
+> **macOS Note:** First-time users may need to right-click → "Open" to bypass Gatekeeper. <a href="https://www.youtube.com/watch?v=_M9RKS_i11I">Check this video out!</a>
 
 ---
 
-## 🚀 Quick Start
+##   Quick Start
 
 1. Launch the app and log in using the provided credentials  
 2. Click **+** to create a new note  
@@ -42,7 +42,7 @@ Electron.js • PostgreSQL • bcrypt.js • Node.js
 
 ---
 
-## 🔍 Preview
+##   Preview
 
 <p align="center">
   <img src="imgs/login.png" width="500" alt="Login Page"> 
@@ -54,7 +54,16 @@ Electron.js • PostgreSQL • bcrypt.js • Node.js
 
 ---
 
-## 🚀 Planned Features
+## Contributing Guidelines
+
+1. Fork the project
+2. Create a feature branch (```git checkout -b ...```)
+3. Commit your changes (```git commit -m "..."```)
+4. Push to the branch (```git push origin ...```)
+5. Open a pull request
+
+
+##   Planned Features
 
 - Multi-user support with Supabase authentication
 - Note tagging and search functionality
@@ -65,7 +74,7 @@ Electron.js • PostgreSQL • bcrypt.js • Node.js
 
 ---
 
-## 📝 License
+##   License
 
 MIT License - see [LICENSE](LICENSE) for details.
 

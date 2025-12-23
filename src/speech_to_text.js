@@ -28,19 +28,12 @@ export function speechToggle(noteContent, speechBtn) {
       console.log("Setting up onSpeechPartial listener...");
       window.authAPI.onSpeechPartial((partial) => {
         console.log("PARTIAL TEXT RECEIVED:", partial);
-        const base = noteContent.innerHTML.replace(
-          /<span class="partial">.*<\/span>/,
-          ""
-        );
-        noteContent.innerHTML =
-          base + `<span class="partial">${partial}</span>`;
-        noteContent.scrollTop = noteContent.scrollHeight;
       });
 
       console.log("All listeners set up successfully");
 
       // Update UI
-      speechIcon.classList.remove("fa-comment-dots");
+      speechIcon.classList.remove("fa-microphone-slash");
       speechIcon.classList.add("fa-microphone");
       speechBtn.classList.add("recording");
       console.log("UI updated to recording state");
@@ -60,7 +53,7 @@ export function speechToggle(noteContent, speechBtn) {
       // Update UI
       speechIcon.classList.remove("fa-microphone");
       speechBtn.classList.remove("recording");
-      speechIcon.classList.add("fa-comment-dots");
+      speechIcon.classList.add("fa-microphone-slash");
       console.log("UI updated to stopped state");
     } catch (error) {
       console.error("Error stopping speech service:", error);
