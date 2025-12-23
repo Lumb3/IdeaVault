@@ -20,7 +20,7 @@ export function speechToggle(noteContent, speechBtn) {
           /<span class="partial">.*<\/span>/,
           ""
         );
-        noteContent.innerHTML += text + " ";
+        noteContent.insertAdjacentText("beforeend", text + " ");
         noteContent.scrollTop = noteContent.scrollHeight;
       });
 
