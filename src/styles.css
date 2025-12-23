@@ -31,6 +31,7 @@ body {
 .app-container {
   display: flex;
   height: 100vh;
+  overflow: hidden;
 }
 
 /* Sidebar */
@@ -40,6 +41,7 @@ body {
   border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
 }
 
 .sidebar-header {
@@ -143,15 +145,6 @@ body {
   text-overflow: ellipsis;
 }
 
-.note-item-preview {
-  font-size: 13px;
-  color: var(--text-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.4;
-}
-
 .note-item-date {
   font-size: 12px;
   color: var(--text-muted);
@@ -164,11 +157,10 @@ body {
   display: flex;
   flex-direction: column;
   background: var(--bg-primary);
-  min-height: 0; 
-  overflow: hidden; 
+  min-height: 0;
+  overflow: hidden;
+  height: 100vh; 
 }
-
-
 
 .editor-header {
   padding: 24px 40px;
@@ -458,7 +450,7 @@ body.dark-mode .cancel-btn:hover {
 
 .note-content {
   flex: 1;
-  min-height: 0; 
+  min-height: 0;
   padding: 36px 44px;
   background: #fffdf7;
   border: 1px solid #e7e2d4;
@@ -476,7 +468,6 @@ body.dark-mode .cancel-btn:hover {
   overflow-y: auto; /* Allow vertical scrolling */
   overflow-x: hidden; /* Prevent horizontal scrolling */
 }
-
 
 .note-content::placeholder {
   color: var(--text-muted);
@@ -607,7 +598,6 @@ body.dark-mode .cancel-btn:hover {
   color: var(--text-primary);
 }
 
-
 /* Add these styles to your styles.css or decoration.css */
 
 /* Image wrapper and controls */
@@ -709,4 +699,3 @@ body.dark-mode .image-wrapper {
 .image-wrapper {
   animation: imageInsert 0.3s ease;
 }
-

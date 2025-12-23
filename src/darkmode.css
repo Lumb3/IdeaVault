@@ -83,10 +83,6 @@ body {
   color: var(--text-primary);
 }
 
-.note-item-preview {
-  color: var(--text-secondary);
-}
-
 .note-item-date {
   color: var(--text-muted);
 }
