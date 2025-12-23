@@ -4,3 +4,4 @@ build/speech_service/
 build/
 *.pkg
 *.pyz
+*.env

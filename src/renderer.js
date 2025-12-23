@@ -435,8 +435,6 @@ function handleNoteEdit() {
 
   if (noteItem) {
     noteItem.querySelector(".note-item-title").textContent = note.title;
-    noteItem.querySelector(".note-item-preview").innerText =
-      noteContent.innerText.substring(0, 60) || "No content";
   }
 
   clearTimeout(saveTimeout);
@@ -474,9 +472,6 @@ function renderNotesList(filter = "") {
 
     noteItem.innerHTML = `
       <div class="note-item-title">${note.title || "Untitled"}</div>
-      <div class="note-item-preview">${
-        note.content.substring(0, 60) || "No content"
-      }</div>
       <div class="note-item-date">${date}</div>
     `;
 
