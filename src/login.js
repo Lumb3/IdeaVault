@@ -45,6 +45,6 @@ async function checkPasswordandUsername() {
   }
 }
 
-signUp.addEventListener("click", function () {
+signUp.addEventListener("click", async function () {
   window.location.href = "signup.html";
 });

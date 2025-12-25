@@ -16,8 +16,10 @@ const {
 } = require("docx");
 const { spawn } = require("child_process");
 
+
 let speechProcess = null;
 let mainWindow = null;
+let currentUserId = null;
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -260,6 +262,7 @@ function registerIPCHandlers() {
             const valid = bcrypt.compareSync(password, data.password);
 
             if (valid) {
+                currentUserId = data.id; // Store the user ID
                 return { success: true, message: "Login successful" };
             } else {
                 return { success: false, message: "Wrong password" };
@@ -276,6 +279,7 @@ function registerIPCHandlers() {
             const { data, error } = await supabase
                 .from('notes')
                 .select('*')
+                .eq('user_id', currentUserId)
                 .order('updated_at', { ascending: false });
 
             if (error) {
@@ -312,6 +316,7 @@ function registerIPCHandlers() {
                 content: note.content,
                 created_at: note.createdAt,
                 updated_at: note.updatedAt,
+                user_id: currentUserId,
             }));
 
             const { error } = await supabase
@@ -336,7 +341,8 @@ function registerIPCHandlers() {
             const { error } = await supabase
                 .from('notes')
                 .delete()
-                .eq('id', noteId);
+                .eq('id', noteId)
+                .eq('user_id', currentUserId);
 
             if (error) {
                 console.error("Error deleting note:", error);
@@ -349,9 +355,35 @@ function registerIPCHandlers() {
             throw err;
         }
     });
+    ipcMain.handle("signup-attempt", async (event, { username, password }) => {
+        try {
+            const { data: existingUser, error: checkError } = await supabase.from('users').select('username').eq('username', username).single();
+            if (existingUser) {
+                return { success: false, message: "Username already exists" };
+            }
+            const hashedPassword = bcrypt.hashSync(password, 10);
 
+            // Insert new user
+            const { data, error } = await supabase.from('users').insert([
+                {
+                    username: username,
+                    password: hashedPassword
+                }
+            ]).select().single();
+            if (error) {
+                console.error("Signup error: ", error);
+                return { success: false, message: "Failed to create account" };
+            }
+            currentUserId = data.id;
+            return { success: true, message: "Account created successfully" };
+        } catch (err) {
+            console.error("Signup error: ", err);
+            return { success: false, message: "Server error" };
+        }
+    });
     // Handle quit app
     ipcMain.handle("quit-app", async () => {
+        currentUserId = null;
         app.quit();
     });
 
