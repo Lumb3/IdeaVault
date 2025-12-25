@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Account | IdeaVault</title>
+
+    <link rel="stylesheet" href="signup.css" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+      crossorigin="anonymous"
+    />
+  </head>
+
+  <body>
+    <h1>Create your IdeaVault account</h1>
+
+    <div class="card">
+      <h2 style="text-align: center">Sign Up</h2>
+
+      <div class="input-group">
+        <i class="fa-solid fa-user"></i>
+        <input type="text" placeholder="Name" id="name" />
+      </div>
+
+      <div class="input-group">
+        <i class="fa-solid fa-lock"></i>
+        <input type="password" placeholder="Password" id="password" />
+        <i class="fa-solid fa-eye-slash toggle" id="togglePassword"></i>
+      </div>
+
+      <div class="input-group">
+        <i class="fa-solid fa-lock"></i>
+        <input
+          type="password"
+          placeholder="Confirm Password"
+          id="confirm-password"
+        />
+      </div>
+
+      <button class="primary-btn" id="createAccountBtn">Create Account</button>
+
+      <p class="footer-text">
+        Already have an account?
+        <a href="login.html">Sign in</a>
+      </p>
+    </div>
+    <div id="alert" class=""></div>
+
+    <!-- JavaScript -->
+    <script src="signup.js"></script>
+  </body>
+</html>

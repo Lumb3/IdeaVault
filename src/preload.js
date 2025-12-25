@@ -6,6 +6,8 @@ contextBridge.exposeInMainWorld("authAPI", {
   //  AUTH 
   login: (username, password) =>
     ipcRenderer.invoke("login-attempt", { username, password }),
+  signup: (username, password) =>
+    ipcRenderer.invoke("signup-attempt", { username, password }),
 
   //  NOTES 
   load: () => ipcRenderer.invoke("load-notes"),
