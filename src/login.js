@@ -4,11 +4,12 @@ const toggle_Lock = document.getElementById("toggleLock");
 const username = document.getElementById("username");
 const alertBox = document.getElementById("alert");
 const loginBtn = document.getElementById("loginBtn");
+const signUp = document.getElementById("signupBtn");
 
 togglePassword.addEventListener("click", function () {
   // Toggle password visibility
   const type =
-  password.getAttribute("type") === "password" ? "text" : "password";
+    password.getAttribute("type") === "password" ? "text" : "password";
   password.setAttribute("type", type);
   this.classList.toggle("fa-eye-slash");
   this.classList.toggle("fa-eye");
@@ -16,11 +17,13 @@ togglePassword.addEventListener("click", function () {
 
 // Will be encrypted through hashing
 loginBtn.addEventListener("click", checkPasswordandUsername);
+
 document.addEventListener("keydown", (event) => {
   if (event.key == "Enter") {
     loginBtn.click(); // programmatically presses the loginBtn
   }
 });
+
 async function checkPasswordandUsername() {
   const response = await window.authAPI.login(username.value, password.value);
   alertBox.classList.remove("error", "success");
@@ -41,3 +44,7 @@ async function checkPasswordandUsername() {
     console.log("Wrong Password. Error");
   }
 }
+
+signUp.addEventListener("click", function () {
+  window.location.href = "signup.html";
+});

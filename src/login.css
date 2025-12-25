@@ -21,7 +21,7 @@
   --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* ---------- Page Background ---------- */
+
 body {
   height: 100vh;
   display: flex;
@@ -34,7 +34,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ---------- Page Title ---------- */
+
 h1 {
   font-weight: 600;
   font-size: 28px;
@@ -44,7 +44,7 @@ h1 {
   letter-spacing: -0.02em;
 }
 
-/* ---------- Login Card ---------- */
+
 .border {
   background: var(--bg-secondary);
   padding: 48px 40px;
@@ -69,7 +69,7 @@ h1 {
   letter-spacing: -0.02em;
 }
 
-/* ---------- Input Fields ---------- */
+
 .username-border,
 .password-border {
   display: flex;
@@ -110,7 +110,7 @@ input::placeholder {
   color: var(--text-muted);
 }
 
-/* ---------- Icon Styling ---------- */
+
 i {
   font-size: 16px;
   color: var(--accent-color) !important;
@@ -122,7 +122,7 @@ i {
   color: var(--accent-hover) !important;
 }
 
-/* ---------- Password Toggle Icon ---------- */
+
 #togglePassword {
   cursor: pointer;
   transition: all 0.2s ease;
@@ -133,9 +133,32 @@ i {
   color: var(--accent-hover) !important;
 }
 
-/* ---------- Login Button ---------- */
+
+.signup-border {
+  margin-top: 18px;
+}
+
 .login-border {
-  margin-top: 28px;
+  margin-top: 12px;
+}
+
+
+#signupBtn {
+  background-color: transparent;
+  color: var(--accent-color);
+  border: 1.5px solid var(--accent-color);
+  box-shadow: none;
+}
+
+#signupBtn:hover {
+  background-color: rgba(201, 163, 101, 0.08);
+  color: var(--accent-hover);
+  border-color: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+#signupBtn:active {
+  transform: translateY(0);
 }
 
 button {
