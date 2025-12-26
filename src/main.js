@@ -60,13 +60,14 @@ function startSpeechService() {
 
     console.log("Starting speech service...");
 
-    const speechBinaryPath = app.isPackaged
-        ? path.join(process.resourcesPath, "speech_service")
-        : path.join(__dirname, "..", "dist", "speech_service");
+    const scriptPath = app.isPackaged
+        ? path.join(process.resourcesPath, "backend", "speech_service.py")
+        : path.join(__dirname, "..", "backend", "speech_service.py");
 
-    console.log("Binary path:", speechBinaryPath);
+    console.log("Speech script path:", scriptPath);
 
-    speechProcess = spawn(speechBinaryPath, [], {
+
+    speechProcess = spawn("python3", [scriptPath], {
         stdio: ["ignore", "pipe", "pipe"],
     });
 
@@ -118,29 +119,19 @@ function startSpeechService() {
 }
 
 function stopSpeechService() {
-    if (speechProcess) {
-        console.log("Stopping speech service...");
+    if (!speechProcess) return;
 
+    console.log("Stopping speech service immediately");
 
-        speechProcess.removeAllListeners();
-
-        speechProcess.kill('SIGTERM');
-
-        const killTimeout = setTimeout(() => {
-            if (speechProcess && !speechProcess.killed) {
-                console.log("Force killing speech service...");
-                speechProcess.kill('SIGKILL');
-            }
-        }, 1000);
-
-        speechProcess.on('exit', () => {
-            clearTimeout(killTimeout);
-            speechProcess = null;
-            console.log("Speech service terminated");
-        });
-
+    try {
+        speechProcess.kill("SIGKILL");
+    } catch (e) {
+        console.warn("Failed to kill speech service:", e);
     }
+
+    speechProcess = null;
 }
+
 
 ipcMain.handle("start-speech-service", async () => {
     console.log("IPC start-speech-service called");
@@ -493,12 +484,12 @@ function registerIPCHandlers() {
     });
     // Handle quit app
     ipcMain.handle("quit-app", async () => {
+        console.log("IPC quit-app received");
         currentUserId = null;
         stopSpeechService();
-        setTimeout(() => {
-            app.quit();
-        }, 500);
+        app.quit();
     });
+
 
     console.log("All IPC handlers registered successfully");
 }
@@ -531,24 +522,21 @@ app.whenReady().then(async () => {
 
 app.on("window-all-closed", () => {
     if (process.platform !== "darwin") {
-        stopSpeechService();
         app.quit();
     }
 });
 
-app.on("before-quit", () => {
-    if (speechProcess && !speechProcess.killed) {
-        event.preventDefault(); // Prevent quit until cleanup is done
 
-        stopSpeechService();
+app.on("before-quit", (event) => {
+    console.log("App quitting...");
 
-        // Force quit after 2 seconds if speech service doesn't stop
-        setTimeout(() => {
-            speechProcess = null;
-            app.quit();
-        }, 2000);
+    if (speechProcess) {
+        console.log("Force-killing speech service");
+        speechProcess.kill("SIGKILL");
+        speechProcess = null;
     }
 });
+
 
 app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {

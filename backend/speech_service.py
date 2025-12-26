@@ -1,23 +1,34 @@
-# speech_service.py
+# backend/speech_service.py
 import os
 import sys
 import json
 import pyaudio
 from vosk import Model, KaldiRecognizer
 
-# Determine base path (works with PyInstaller)
-if getattr(sys, 'frozen', False):
+if getattr(sys, "frozen", False):
     base_path = sys._MEIPASS
 else:
     base_path = os.path.dirname(os.path.abspath(__file__))
 
-# Model path
-model_path = os.path.join(base_path, "models", "vosk-model-small-en-us-0.15")
-model = Model(model_path)
+
+MODEL_PATH = os.path.join(
+    "models",
+    "vosk-model-small-en-us-0.15"
+)
+
+print("Using Vosk model path:", MODEL_PATH, flush=True)
+
+
+if not os.path.isdir(MODEL_PATH):
+    print(f"ERROR: Vosk model not found at {MODEL_PATH}", file=sys.stderr, flush=True)
+    sys.exit(1)
+
+model = Model(MODEL_PATH)
 recognizer = KaldiRecognizer(model, 16000)
 
-# Setup PyAudio
+
 p = pyaudio.PyAudio()
+
 stream = p.open(
     format=pyaudio.paInt16,
     channels=1,
@@ -25,25 +36,28 @@ stream = p.open(
     input=True,
     frames_per_buffer=8192
 )
-stream.start_stream()
 
-print("Listening... Press Ctrl+C to stop.")
+stream.start_stream()
+print("Listening...", flush=True)
 
 try:
     while True:
         data = stream.read(8192, exception_on_overflow=False)
+
         if recognizer.AcceptWaveform(data):
             result = json.loads(recognizer.Result())
-            if result["text"]:
-                # Print to stdout with no extra spaces, flush immediately
-                print(f"Text: {result['text']}", flush=True)
+            text = result.get("text", "").strip()
+            if text:
+                print(f"Text: {text}", flush=True)
         else:
             partial = json.loads(recognizer.PartialResult())
-            if partial['partial']:
-                # Print to stdout with no extra spaces, flush immediately
-                print(f"Partial: {partial['partial']}", flush=True)
+            part = partial.get("partial", "").strip()
+            if part:
+                print(f"Partial: {part}", flush=True)
+
 except KeyboardInterrupt:
-    print("\nStopping...")
+    print("Stopping...", flush=True)
+
 finally:
     stream.stop_stream()
     stream.close()

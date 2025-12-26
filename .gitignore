@@ -5,3 +5,4 @@ build/
 *.pkg
 *.pyz
 *.env
+/release
