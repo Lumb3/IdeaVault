@@ -1,8 +1,17 @@
 // main.js
-require("dotenv").config();
-const { app, BrowserWindow, ipcMain } = require("electron");
-app.commandLine.appendSwitch("enable-speech-input");
 const path = require("path");
+const { app, BrowserWindow, ipcMain } = require("electron");
+
+
+if (app.isPackaged) {
+    require("dotenv").config({
+        path: path.join(process.resourcesPath, ".env")
+    });
+} else {
+    require("dotenv").config();
+}
+
+app.commandLine.appendSwitch("enable-speech-input");
 const bcrypt = require("bcryptjs");
 const { createClient } = require("@supabase/supabase-js");
 
@@ -17,7 +26,6 @@ const {
 } = require("docx");
 const { spawn } = require("child_process");
 
-
 let speechProcess = null;
 let mainWindow = null;
 let currentUserId = null;
@@ -26,6 +34,13 @@ let currentUserId = null;
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
+
+// Add debug logging to see what's happening
+console.log("Packaged:", app.isPackaged);
+console.log("Resources path:", process.resourcesPath);
+console.log("Supabase URL exists:", !!supabaseUrl);
+console.log("Supabase Key exists:", !!supabaseKey);
+
 // Validate environment variables
 if (!supabaseUrl || !supabaseKey) {
     console.error('ERROR: Missing Supabase credentials!');
@@ -45,7 +60,10 @@ function startSpeechService() {
 
     console.log("Starting speech service...");
 
-    const speechBinaryPath = path.join(__dirname, "..", "dist", "speech_service");
+    const speechBinaryPath = app.isPackaged
+        ? path.join(process.resourcesPath, "speech_service")
+        : path.join(__dirname, "..", "dist", "speech_service");
+
     console.log("Binary path:", speechBinaryPath);
 
     speechProcess = spawn(speechBinaryPath, [], {
@@ -102,8 +120,25 @@ function startSpeechService() {
 function stopSpeechService() {
     if (speechProcess) {
         console.log("Stopping speech service...");
-        speechProcess.kill();
-        speechProcess = null;
+
+
+        speechProcess.removeAllListeners();
+
+        speechProcess.kill('SIGTERM');
+
+        const killTimeout = setTimeout(() => {
+            if (speechProcess && !speechProcess.killed) {
+                console.log("Force killing speech service...");
+                speechProcess.kill('SIGKILL');
+            }
+        }, 1000);
+
+        speechProcess.on('exit', () => {
+            clearTimeout(killTimeout);
+            speechProcess = null;
+            console.log("Speech service terminated");
+        });
+
     }
 }
 
@@ -459,7 +494,10 @@ function registerIPCHandlers() {
     // Handle quit app
     ipcMain.handle("quit-app", async () => {
         currentUserId = null;
-        app.quit();
+        stopSpeechService();
+        setTimeout(() => {
+            app.quit();
+        }, 500);
     });
 
     console.log("All IPC handlers registered successfully");
@@ -499,7 +537,17 @@ app.on("window-all-closed", () => {
 });
 
 app.on("before-quit", () => {
-    stopSpeechService();
+    if (speechProcess && !speechProcess.killed) {
+        event.preventDefault(); // Prevent quit until cleanup is done
+
+        stopSpeechService();
+
+        // Force quit after 2 seconds if speech service doesn't stop
+        setTimeout(() => {
+            speechProcess = null;
+            app.quit();
+        }, 2000);
+    }
 });
 
 app.on("activate", () => {
