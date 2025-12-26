@@ -8,7 +8,7 @@ A simple desktop app for organizing notes and securely storing personal informat
 
 - **Secure Login** with bcrypt password hashing
 - **Auto-Save** to prevent data loss
-- **Remote Database** (PostgreSQL)
+- **Remote Database** (PostgreSQL/Supabase)
 - **Cross-Platform** (macOS, Windows, Linux)
 
 ---
@@ -23,7 +23,7 @@ Electron.js • PostgreSQL • bcrypt.js • Node.js
 
 **Requirements:** macOS (ARM64), Internet connection
 
-1. Download **v3.0.0** from [Releases](https://github.com/Lumb3/IdeaVault/releases/tag/second_release)
+1. Download **v3.0.0** from [Releases](https://github.com/Lumb3/IdeaVault/releases/tag/beta_test)
 2. Extract `IdeaVault.zip` and open the `mac-arm64` folder
 3. Double-click **IdeaVault** to launch
 
@@ -63,11 +63,8 @@ Electron.js • PostgreSQL • bcrypt.js • Node.js
 
 ## Planned Features
 
-- Multi-user support with Supabase authentication
-- Note tagging and search functionality
+- Note tagging
 - Mobile companion app
-- Dark mode
-- Export to PDF/Markdown
 - Reminders and notifications
 
 ---
