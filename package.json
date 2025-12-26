@@ -1,10 +1,10 @@
 {
   "name": "IdeaVault",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "productName": "IdeaVault",
   "description": "A desktop note and idea management app with voice-to-text capabilities",
   "main": "src/main.js",
-  "author": "Erik",
+  "author": "Eric",
   "license": "MIT",
   "scripts": {
     "start": "electron .",
@@ -35,9 +35,10 @@
       "package.json"
     ],
     "extraResources": [
+      ".env",
       {
         "from": "dist/speech_service",
-        "to": "backend/speech_service",
+        "to": "speech_service",
         "filter": [
           "**/*"
         ]
