@@ -13,6 +13,7 @@ const {
     TextRun,
     HeadingLevel,
     BorderStyle,
+    ImageRun,
 } = require("docx");
 const { spawn } = require("child_process");
 
@@ -20,6 +21,7 @@ const { spawn } = require("child_process");
 let speechProcess = null;
 let mainWindow = null;
 let currentUserId = null;
+
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -161,78 +163,151 @@ function registerIPCHandlers() {
     ipcMain.handle("generate-docx", async (event, noteData) => {
         try {
             console.log("Generating DOCX for note:", noteData.title);
-            const { title, content, createdAt, updatedAt } = noteData;
+            const { title, content, createdAt, updatedAt, images } = noteData;
 
-            const contentParagraphs = content.split("\n").map(
-                (line) =>
-                    new Paragraph({
-                        children: [
-                            new TextRun({
-                                text: line || " ",
-                                size: 24,
-                            }),
-                        ],
-                        spacing: {
-                            after: 100,
-                        },
-                    })
+            console.log("Received images array: ", images);
+            console.log("Images length: ", images?.length);
+            console.log("ImageRun available?", !!ImageRun);
+            if (images && images.length > 0) {
+                console.log("First image src preview: ", images[0].src?.substring(0, 50));
+            }
+            const children = [];
+
+            // Add title
+            children.push(
+                new Paragraph({
+                    text: title,
+                    heading: HeadingLevel.HEADING_1,
+                    spacing: {
+                        after: 200,
+                    },
+                })
             );
 
+            // Add separator
+            children.push(
+                new Paragraph({
+                    border: {
+                        bottom: {
+                            color: "000000",
+                            space: 1,
+                            style: BorderStyle.SINGLE,
+                            size: 6,
+                        },
+                    },
+                    spacing: {
+                        after: 200,
+                    },
+                })
+            );
+
+            // Process content with proper newline support
+            const contentLines = content.split("\n");
+
+            for (let line of contentLines) {
+                if (line.trim()) {
+                    // Regular text paragraph
+                    children.push(
+                        new Paragraph({
+                            children: [
+                                new TextRun({
+                                    text: line,
+                                    size: 24,
+                                }),
+                            ],
+                            spacing: {
+                                after: 100,
+                            },
+                        })
+                    );
+                } else {
+                    // Empty line - add spacing
+                    children.push(
+                        new Paragraph({
+                            text: "",
+                            spacing: {
+                                after: 100,
+                            },
+                        })
+                    );
+                }
+            }
+
+            // Add images section
+            // Add images section
+            if (images && images.length > 0 && ImageRun) {
+                console.log("ImageRun is available, attempting to add images...");
+                for (let img of images) {
+                    try {
+                        // Extract base64 data from data URL
+                        const base64Data = img.src.split(',')[1];
+                        const imageBuffer = Buffer.from(base64Data, 'base64');
+
+                        // Add image to document
+                        children.push(
+                            new Paragraph({
+                                children: [
+                                    new ImageRun({
+                                        data: imageBuffer,
+                                        transformation: {
+                                            width: 400,
+                                            height: 300,
+                                        },
+                                    }),
+                                ],
+                                spacing: {
+                                    before: 100,
+                                    after: 200,
+                                },
+                            })
+                        );
+                    } catch (imgError) {
+                        console.error("Error adding image to DOCX:", imgError);
+                        // Image fails silently - no placeholder added
+                    }
+                }
+            }
+
+            // Add metadata
+            children.push(
+                new Paragraph({
+                    text: "",
+                    spacing: {
+                        after: 200,
+                    },
+                })
+            );
+
+            children.push(
+                new Paragraph({
+                    children: [
+                        new TextRun({
+                            text: `Created: ${new Date(createdAt).toLocaleString()}`,
+                            size: 18,
+                            color: "808080",
+                        }),
+                    ],
+                })
+            );
+
+            children.push(
+                new Paragraph({
+                    children: [
+                        new TextRun({
+                            text: `Last Updated: ${new Date(updatedAt).toLocaleString()}`,
+                            size: 18,
+                            color: "808080",
+                        }),
+                    ],
+                })
+            );
+
+            // Create document
             const doc = new Document({
                 sections: [
                     {
                         properties: {},
-                        children: [
-                            new Paragraph({
-                                text: title,
-                                heading: HeadingLevel.HEADING_1,
-                                spacing: {
-                                    after: 200,
-                                },
-                            }),
-
-                            new Paragraph({
-                                border: {
-                                    bottom: {
-                                        color: "000000",
-                                        space: 1,
-                                        style: BorderStyle.SINGLE,
-                                        size: 6,
-                                    },
-                                },
-                                spacing: {
-                                    after: 200,
-                                },
-                            }),
-
-                            ...contentParagraphs,
-
-                            new Paragraph({
-                                text: "",
-                                spacing: {
-                                    after: 200,
-                                },
-                            }),
-
-                            new Paragraph({
-                                children: [
-                                    new TextRun({
-                                        text: `Created: ${new Date(createdAt).toLocaleString()}`,
-                                        size: 18,
-                                        color: "808080",
-                                    }),
-                                ],
-                            }),
-                            new Paragraph({
-                                children: [
-                                    new TextRun({
-                                        text: `Last Updated: ${new Date(updatedAt).toLocaleString()}`,
-                                        size: 18,
-                                        color: "808080",
-                                    }),
-                                ],
-                            }),
-                        ],
+                        children: children,
                     },
                 ],
             });
