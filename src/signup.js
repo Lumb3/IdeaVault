@@ -25,49 +25,49 @@ createBtn.addEventListener("click", async () => {
   const name = nameInput.value.trim();
   const password = passwordInput.value;
   const confirmPassword = confirmPasswordInput.value;
-  
+
   // Clear any existing alerts
   alertBox.style.display = "none";
   alertBox.classList.remove("error", "success");
-  
+
   if (!name) {
     showError("Please enter a username");
     return;
   }
-  
+
   if (name.length < 3) {
     showError("Username must be at least 3 characters");
     return;
   }
-  
+
   if (password === "" || confirmPassword === "") {
     showError("Please enter your password");
     return;
   }
-  
+
   if (password.length < 6) {
     showError("Password must be at least 6 characters");
     return;
   }
-  
+
   if (password !== confirmPassword) {
     showError("Password mismatch. Please try again.");
     return;
   }
-  
+
   // Disable button during signup
   createBtn.disabled = true;
   createBtn.textContent = "Creating account...";
-  
+
   try {
     const response = await window.authAPI.signup(name, password);
-    
+
     if (response.success) {
       alertBox.classList.remove("error");
       alertBox.classList.add("success");
       alertBox.style.display = "block";
       alertBox.textContent = "Account created successfully!";
-      
+
       // Redirect to login after 1.5 seconds
       setTimeout(() => {
         window.location.href = "login.html";
@@ -82,5 +82,11 @@ createBtn.addEventListener("click", async () => {
     showError("An error occurred. Please try again.");
     createBtn.disabled = false;
     createBtn.textContent = "Create Account";
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    createBtn.click();
   }
 });
