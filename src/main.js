@@ -60,15 +60,16 @@ function startSpeechService() {
 
     console.log("Starting speech service...");
 
-    const scriptPath = app.isPackaged
-        ? path.join(process.resourcesPath, "backend", "speech_service.py")
-        : path.join(__dirname, "..", "backend", "speech_service.py");
+    const speechCommand = app.isPackaged
+        ? path.join(process.resourcesPath, "speech_service")
+        : "python3";
 
-    console.log("Speech script path:", scriptPath);
+    const speechArgs = app.isPackaged
+        ? []
+        : [path.join(__dirname, "..", "backend", "speech_service.py")];
 
-
-    speechProcess = spawn("python3", [scriptPath], {
-        stdio: ["ignore", "pipe", "pipe"],
+    speechProcess = spawn(speechCommand, speechArgs, {
+        stdio: ["ignore", "pipe", "pipe"]
     });
 
     console.log("Speech process spawned, PID:", speechProcess.pid);
