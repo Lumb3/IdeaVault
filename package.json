@@ -27,6 +27,7 @@
   "build": {
     "appId": "com.erik.ideavault",
     "productName": "IdeaVault",
+    "afterPack": "./src/after-pack.js",
     "files": [
       "src/**/*",
       "assets/**/*",

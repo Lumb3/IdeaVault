@@ -52,6 +52,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 
 // Start speech recognition service
+// Start speech recognition service
 function startSpeechService() {
     if (speechProcess) {
         console.log("Speech service already running");
@@ -59,64 +60,107 @@ function startSpeechService() {
     }
 
     console.log("Starting speech service...");
+    console.log("App packaged:", app.isPackaged);
+    console.log("Process resourcesPath:", process.resourcesPath);
 
     const speechCommand = app.isPackaged
-        ? path.join(process.resourcesPath, "speech_service")
+        ? path.join(process.resourcesPath, "speech_service", "speech_service")  // ← FIX: Added /speech_service
         : "python3";
 
     const speechArgs = app.isPackaged
         ? []
         : [path.join(__dirname, "..", "backend", "speech_service.py")];
 
-    speechProcess = spawn(speechCommand, speechArgs, {
-        stdio: ["ignore", "pipe", "pipe"]
-    });
-
-    console.log("Speech process spawned, PID:", speechProcess.pid);
-
-    speechProcess.stdout.on("data", (data) => {
-        const output = data.toString().trim();
-        console.log("RAW STDOUT:", output);
-
-        if (output.startsWith("Text: ")) {
-            const text = output.replace("Text:", "").trim();
-            console.log("Sending FINAL text to renderer:", text);
-
-            if (mainWindow && !mainWindow.isDestroyed()) {
-                mainWindow.webContents.send("speech-final", text);
-                console.log("Final text sent successfully");
-            } else {
-                console.error("mainWindow not available!");
-            }
+    console.log("Speech command:", speechCommand);
+    console.log("Speech args:", speechArgs);
+    
+    // Add check to verify the command exists
+    const fs = require('fs');
+    if (app.isPackaged && !fs.existsSync(speechCommand)) {
+        console.error("ERROR: Speech service executable not found at:", speechCommand);
+        console.error("Contents of speech_service dir:");
+        const serviceDir = path.join(process.resourcesPath, "speech_service");
+        if (fs.existsSync(serviceDir)) {
+            console.error(fs.readdirSync(serviceDir));
         }
+        return;
+    }
 
-        if (output.startsWith("Partial: ")) {
-            const partial = output.replace("Partial:", "").trim();
-            console.log("⚡ Sending PARTIAL text to renderer:", partial);
-
-            if (mainWindow && !mainWindow.isDestroyed()) {
-                mainWindow.webContents.send("speech-partial", partial);
-                console.log("Partial text sent successfully");
-            } else {
-                console.error("mainWindow not available!");
+    try {
+        speechProcess = spawn(speechCommand, speechArgs, {
+            stdio: ["ignore", "pipe", "pipe"],
+            env: {
+                ...process.env,
+                PYTHONUNBUFFERED: "1"
             }
-        }
-    });
+        });
 
-    speechProcess.stderr.on("data", (data) => {
-        const errMsg = data.toString();
-        console.log("Speech service stderr:", errMsg);
-    });
+        console.log("Speech process spawned, PID:", speechProcess.pid);
 
-    speechProcess.on("close", (code) => {
-        console.log("Speech service stopped with code", code);
+        // Set up a timeout to detect if process dies immediately
+        const startupTimeout = setTimeout(() => {
+            if (speechProcess && !speechProcess.killed) {
+                console.log("✓ Speech process still running after 2 seconds");
+            }
+        }, 2000);
+
+        speechProcess.stdout.on("data", (data) => {
+            const output = data.toString().trim();
+            console.log("RAW STDOUT:", output);
+
+            if (output.startsWith("Text: ")) {
+                const text = output.replace("Text:", "").trim();
+                console.log("Sending FINAL text to renderer:", text);
+
+                if (mainWindow && !mainWindow.isDestroyed()) {
+                    mainWindow.webContents.send("speech-final", text);
+                    console.log("Final text sent successfully");
+                }
+            }
+
+            if (output.startsWith("Partial: ")) {
+                const partial = output.replace("Partial:", "").trim();
+                console.log("⚡ Sending PARTIAL text to renderer:", partial);
+
+                if (mainWindow && !mainWindow.isDestroyed()) {
+                    mainWindow.webContents.send("speech-partial", partial);
+                    console.log("Partial text sent successfully");
+                }
+            }
+        });
+
+        speechProcess.stderr.on("data", (data) => {
+            const errMsg = data.toString();
+            console.error("Speech service STDERR:", errMsg);
+        });
+
+        speechProcess.on("close", (code, signal) => {
+            clearTimeout(startupTimeout);
+            console.log(`Speech service CLOSED - Code: ${code}, Signal: ${signal}`);
+            speechProcess = null;
+        });
+
+        speechProcess.on("exit", (code, signal) => {
+            clearTimeout(startupTimeout);
+            console.log(`Speech service EXITED - Code: ${code}, Signal: ${signal}`);
+            speechProcess = null;
+        });
+
+        speechProcess.on("error", (error) => {
+            clearTimeout(startupTimeout);
+            console.error("Speech process ERROR:", error);
+            console.error("Error details:", {
+                code: error.code,
+                syscall: error.syscall,
+                path: error.path
+            });
+            speechProcess = null;
+        });
+
+    } catch (error) {
+        console.error("Failed to spawn speech process:", error);
         speechProcess = null;
-    });
-
-    speechProcess.on("error", (error) => {
-        console.error("Speech process error:", error);
-        speechProcess = null;
-    });
+    }
 }
 
 function stopSpeechService() {
