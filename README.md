@@ -2,7 +2,7 @@
 
 ## Welcome to **IdeaVault v3.0.0** (Beta)
 
-**IdeaVault** is a simple desktop application for organizing notes and securely storing personal information. Future versions will support multiple users and expanded features.
+**IdeaVault** is a simple desktop application for organizing notes and securely storing personal information. 
 
 ---
 
@@ -23,17 +23,13 @@ Electron.js • Node.js • PostgreSQL • Supabase • bcrypt.js
 
 ## Installation
 
-**Requirements**
-
-* macOS (ARM64)
-* Active internet connection
+**Requirements: **  macOS OR ARM64, Internet connection
 
 ### Steps
 
-1. Download **v3.0.0** from the [Releases page](https://github.com/Lumb3/IdeaVault/releases/tag/beta_test)
-2. Extract `IdeaVault.zip`
-3. Open the `mac-arm64` folder
-4. Double-click **IdeaVault** to launch the app
+1. Download **v3.0.0** from [Releases](https://github.com/Lumb3/IdeaVault/releases/tag/beta_test)
+2. Install the `mac-arm64` or `.zip` file
+3. Open the app, enjoy the show
 
 > **macOS Gatekeeper Note:**
 > If macOS blocks the app on first launch, right-click the app → **Open**.
@@ -104,11 +100,8 @@ All data is managed via **Supabase** with a PostgreSQL backend.
 
 ## Planned Features
 
-* Multi-user support with Supabase Authentication
 * Note tagging and full-text search
 * Mobile companion app
-* Enhanced dark mode
-* Export notes to PDF and Markdown
 * Reminders and notifications
 
 ---
