@@ -1,9 +1,14 @@
 let speechActive = false;
+let isProcessing = false; 
+
 const speechIcon = document.querySelector("#speechIcon");
 
 export function speechToggle(noteContent, speechBtn) {
   console.log("=== speechToggle called ===");
-
+  if (isProcessing) {
+    console.log ("Already processing, ignoring click!");
+  }
+  isProcessing = true;
   if (!speechActive) {
     console.log("Starting speech service...");
 
@@ -60,5 +65,5 @@ export function speechToggle(noteContent, speechBtn) {
     }
   }
 
-  console.log("=== speechToggle finished ===\n");
+  console.log("speechToggle finished\n");
 }

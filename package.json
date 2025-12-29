@@ -27,7 +27,6 @@
   "build": {
     "appId": "com.erik.ideavault",
     "productName": "IdeaVault",
-    "afterPack": "./src/after-pack.js",
     "files": [
       "src/**/*",
       "assets/**/*",
@@ -38,7 +37,10 @@
       ".env",
       {
         "from": "dist/speech_service",
-        "to": "speech_service"
+        "to": "speech_service",
+        "filter": [
+          "**/*"
+        ]
       },
       {
         "from": "models",

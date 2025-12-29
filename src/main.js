@@ -64,7 +64,7 @@ function startSpeechService() {
     console.log("Process resourcesPath:", process.resourcesPath);
 
     const speechCommand = app.isPackaged
-        ? path.join(process.resourcesPath, "speech_service", "speech_service")  // ← FIX: Added /speech_service
+        ? path.join(process.resourcesPath, "speech_service", "speech_service")  
         : "python3";
 
     const speechArgs = app.isPackaged

@@ -48,7 +48,12 @@ function setupEventListeners() {
   document.querySelector(".reset-btn").addEventListener("click", exit);
   download_note.addEventListener("click", download);
   toggle.addEventListener("click", toggleDarkMode);
-  speechBtn.addEventListener("click", () => speechToggle(noteContent, speechBtn));
+  
+  speechBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    speechToggle(noteContent, speechBtn);
+  });
 }
 
 function toggleDarkMode() {
