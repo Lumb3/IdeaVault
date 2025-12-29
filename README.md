@@ -8,10 +8,10 @@
 
 ## Features
 
-- **Secure Login** with bcrypt password hashing
-- **Auto-Save** to prevent data loss
-- **Remote Database** (PostgreSQL)
-- **Cross-Platform** (macOS, Windows, Linux)
+* **Secure Authentication** using bcrypt password hashing
+* **Auto-Save** to prevent data loss
+* **Remote Database** powered by Supabase (BaaS)
+* **Cross-Platform Support** (macOS, Windows, Linux)
 
 ---
 
@@ -23,11 +23,17 @@ Electron.js • Node.js • PostgreSQL • Supabase • bcrypt.js
 
 ## Installation
 
-**Requirements:** macOS (ARM64), Internet connection
+**Requirements**
 
-1. Download **v3.0.0** from [Releases](https://github.com/Lumb3/IdeaVault/releases/tag/second_release)
-2. Extract `IdeaVault.zip` and open the `mac-arm64` folder
-3. Double-click **IdeaVault** to launch
+* macOS (ARM64)
+* Active internet connection
+
+### Steps
+
+1. Download **v3.0.0** from the [Releases page](https://github.com/Lumb3/IdeaVault/releases/tag/beta_test)
+2. Extract `IdeaVault.zip`
+3. Open the `mac-arm64` folder
+4. Double-click **IdeaVault** to launch the app
 
 > **macOS Gatekeeper Note:**
 > If macOS blocks the app on first launch, right-click the app → **Open**.
@@ -98,12 +104,12 @@ All data is managed via **Supabase** with a PostgreSQL backend.
 
 ## Planned Features
 
-- Multi-user support with Supabase authentication
-- Note tagging and search functionality
-- Mobile companion app
-- Dark mode
-- Export to PDF/Markdown
-- Reminders and notifications
+* Multi-user support with Supabase Authentication
+* Note tagging and full-text search
+* Mobile companion app
+* Enhanced dark mode
+* Export notes to PDF and Markdown
+* Reminders and notifications
 
 ---
 
