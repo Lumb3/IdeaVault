@@ -1,26 +1,29 @@
+# -*- mode: python ; coding: utf-8 -*-
 import os
-from PyInstaller.building.build_main import Analysis, PYZ, EXE
-from PyInstaller.utils.hooks import collect_dynamic_libs, collect_data_files
+import sys
+from PyInstaller.utils.hooks import collect_data_files, collect_dynamic_libs
 
-# Project base path
-
-project_path = os.getcwd()
-
-# Collect Vosk and PyAudio binaries and package data
-vosk_binaries = collect_dynamic_libs('vosk')
+# Collect Vosk data files and binaries
 vosk_datas = collect_data_files('vosk')
+vosk_binaries = collect_dynamic_libs('vosk')
+
+# Collect PyAudio binaries
 pyaudio_binaries = collect_dynamic_libs('pyaudio')
-# Include your Vosk model folder
-# Format: (source_path_on_disk, destination_path_relative_to_executable)
-model_datas = [
-    ('models/vosk-model-small-en-us-0.15', 'models/vosk-model-small-en-us-0.15')
-]
+
 a = Analysis(
-    ['backend/speech_service.py'],   # main script
-    pathex=[project_path],
+    ['backend/speech_service.py'],
+    pathex=[],
     binaries=vosk_binaries + pyaudio_binaries,
-    datas=vosk_datas + model_datas,  # <-- model path
-    hiddenimports=['vosk', 'pyaudio'],
+    datas=vosk_datas,
+    hiddenimports=[
+        'vosk',
+        '_vosk',
+        'pyaudio',
+        '_portaudio',
+        'json',
+        'wave',
+        'srt',
+    ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -29,27 +32,32 @@ a = Analysis(
     optimize=0,
 )
 
-pyz = PYZ(a.pure, a.zipped_data, cipher=None)
-
-
+pyz = PYZ(a.pure)
 
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.datas,
     [],
+    exclude_binaries=True,
     name='speech_service',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=False,  # Disable UPX for safety with dynamic libraries
-    upx_exclude=[],
-    runtime_tmpdir=None,
+    upx=True,
     console=True,
     disable_windowed_traceback=False,
     argv_emulation=False,
-    target_arch='arm64',  # Use 'x64' if your system/build is x64
+    target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+)
+
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name='speech_service',
 )

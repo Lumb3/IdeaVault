@@ -1,8 +1,17 @@
 // main.js
-require("dotenv").config();
-const { app, BrowserWindow, ipcMain } = require("electron");
-app.commandLine.appendSwitch("enable-speech-input");
 const path = require("path");
+const { app, BrowserWindow, ipcMain } = require("electron");
+
+
+if (app.isPackaged) {
+    require("dotenv").config({
+        path: path.join(process.resourcesPath, ".env")
+    });
+} else {
+    require("dotenv").config();
+}
+
+app.commandLine.appendSwitch("enable-speech-input");
 const bcrypt = require("bcryptjs");
 const { createClient } = require("@supabase/supabase-js");
 
@@ -17,7 +26,6 @@ const {
 } = require("docx");
 const { spawn } = require("child_process");
 
-
 let speechProcess = null;
 let mainWindow = null;
 let currentUserId = null;
@@ -26,6 +34,13 @@ let currentUserId = null;
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
+
+// Add debug logging to see what's happening
+console.log("Packaged:", app.isPackaged);
+console.log("Resources path:", process.resourcesPath);
+console.log("Supabase URL exists:", !!supabaseUrl);
+console.log("Supabase Key exists:", !!supabaseKey);
+
 // Validate environment variables
 if (!supabaseUrl || !supabaseKey) {
     console.error('ERROR: Missing Supabase credentials!');
@@ -37,6 +52,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 
 // Start speech recognition service
+// Start speech recognition service
 function startSpeechService() {
     if (speechProcess) {
         console.log("Speech service already running");
@@ -44,68 +60,123 @@ function startSpeechService() {
     }
 
     console.log("Starting speech service...");
+    console.log("App packaged:", app.isPackaged);
+    console.log("Process resourcesPath:", process.resourcesPath);
 
-    const speechBinaryPath = path.join(__dirname, "..", "dist", "speech_service");
-    console.log("Binary path:", speechBinaryPath);
+    const speechCommand = app.isPackaged
+        ? path.join(process.resourcesPath, "speech_service", "speech_service")  
+        : "python3";
 
-    speechProcess = spawn(speechBinaryPath, [], {
-        stdio: ["ignore", "pipe", "pipe"],
-    });
+    const speechArgs = app.isPackaged
+        ? []
+        : [path.join(__dirname, "..", "backend", "speech_service.py")];
 
-    console.log("Speech process spawned, PID:", speechProcess.pid);
-
-    speechProcess.stdout.on("data", (data) => {
-        const output = data.toString().trim();
-        console.log("RAW STDOUT:", output);
-
-        if (output.startsWith("Text: ")) {
-            const text = output.replace("Text:", "").trim();
-            console.log("Sending FINAL text to renderer:", text);
-
-            if (mainWindow && !mainWindow.isDestroyed()) {
-                mainWindow.webContents.send("speech-final", text);
-                console.log("Final text sent successfully");
-            } else {
-                console.error("mainWindow not available!");
-            }
+    console.log("Speech command:", speechCommand);
+    console.log("Speech args:", speechArgs);
+    
+    // Add check to verify the command exists
+    const fs = require('fs');
+    if (app.isPackaged && !fs.existsSync(speechCommand)) {
+        console.error("ERROR: Speech service executable not found at:", speechCommand);
+        console.error("Contents of speech_service dir:");
+        const serviceDir = path.join(process.resourcesPath, "speech_service");
+        if (fs.existsSync(serviceDir)) {
+            console.error(fs.readdirSync(serviceDir));
         }
+        return;
+    }
 
-        if (output.startsWith("Partial: ")) {
-            const partial = output.replace("Partial:", "").trim();
-            console.log("⚡ Sending PARTIAL text to renderer:", partial);
-
-            if (mainWindow && !mainWindow.isDestroyed()) {
-                mainWindow.webContents.send("speech-partial", partial);
-                console.log("Partial text sent successfully");
-            } else {
-                console.error("mainWindow not available!");
+    try {
+        speechProcess = spawn(speechCommand, speechArgs, {
+            stdio: ["ignore", "pipe", "pipe"],
+            env: {
+                ...process.env,
+                PYTHONUNBUFFERED: "1"
             }
-        }
-    });
+        });
 
-    speechProcess.stderr.on("data", (data) => {
-        const errMsg = data.toString();
-        console.log("Speech service stderr:", errMsg);
-    });
+        console.log("Speech process spawned, PID:", speechProcess.pid);
 
-    speechProcess.on("close", (code) => {
-        console.log("Speech service stopped with code", code);
-        speechProcess = null;
-    });
+        // Set up a timeout to detect if process dies immediately
+        const startupTimeout = setTimeout(() => {
+            if (speechProcess && !speechProcess.killed) {
+                console.log("✓ Speech process still running after 2 seconds");
+            }
+        }, 2000);
 
-    speechProcess.on("error", (error) => {
-        console.error("Speech process error:", error);
-        speechProcess = null;
-    });
-}
+        speechProcess.stdout.on("data", (data) => {
+            const output = data.toString().trim();
+            console.log("RAW STDOUT:", output);
 
-function stopSpeechService() {
-    if (speechProcess) {
-        console.log("Stopping speech service...");
-        speechProcess.kill();
+            if (output.startsWith("Text: ")) {
+                const text = output.replace("Text:", "").trim();
+                console.log("Sending FINAL text to renderer:", text);
+
+                if (mainWindow && !mainWindow.isDestroyed()) {
+                    mainWindow.webContents.send("speech-final", text);
+                    console.log("Final text sent successfully");
+                }
+            }
+
+            if (output.startsWith("Partial: ")) {
+                const partial = output.replace("Partial:", "").trim();
+                console.log("⚡ Sending PARTIAL text to renderer:", partial);
+
+                if (mainWindow && !mainWindow.isDestroyed()) {
+                    mainWindow.webContents.send("speech-partial", partial);
+                    console.log("Partial text sent successfully");
+                }
+            }
+        });
+
+        speechProcess.stderr.on("data", (data) => {
+            const errMsg = data.toString();
+            console.error("Speech service STDERR:", errMsg);
+        });
+
+        speechProcess.on("close", (code, signal) => {
+            clearTimeout(startupTimeout);
+            console.log(`Speech service CLOSED - Code: ${code}, Signal: ${signal}`);
+            speechProcess = null;
+        });
+
+        speechProcess.on("exit", (code, signal) => {
+            clearTimeout(startupTimeout);
+            console.log(`Speech service EXITED - Code: ${code}, Signal: ${signal}`);
+            speechProcess = null;
+        });
+
+        speechProcess.on("error", (error) => {
+            clearTimeout(startupTimeout);
+            console.error("Speech process ERROR:", error);
+            console.error("Error details:", {
+                code: error.code,
+                syscall: error.syscall,
+                path: error.path
+            });
+            speechProcess = null;
+        });
+
+    } catch (error) {
+        console.error("Failed to spawn speech process:", error);
         speechProcess = null;
     }
 }
+
+function stopSpeechService() {
+    if (!speechProcess) return;
+
+    console.log("Stopping speech service immediately");
+
+    try {
+        speechProcess.kill("SIGKILL");
+    } catch (e) {
+        console.warn("Failed to kill speech service:", e);
+    }
+
+    speechProcess = null;
+}
+
 
 ipcMain.handle("start-speech-service", async () => {
     console.log("IPC start-speech-service called");
@@ -458,9 +529,12 @@ function registerIPCHandlers() {
     });
     // Handle quit app
     ipcMain.handle("quit-app", async () => {
+        console.log("IPC quit-app received");
         currentUserId = null;
+        stopSpeechService();
         app.quit();
     });
+
 
     console.log("All IPC handlers registered successfully");
 }
@@ -493,14 +567,21 @@ app.whenReady().then(async () => {
 
 app.on("window-all-closed", () => {
     if (process.platform !== "darwin") {
-        stopSpeechService();
         app.quit();
     }
 });
 
-app.on("before-quit", () => {
-    stopSpeechService();
+
+app.on("before-quit", (event) => {
+    console.log("App quitting...");
+
+    if (speechProcess) {
+        console.log("Force-killing speech service");
+        speechProcess.kill("SIGKILL");
+        speechProcess = null;
+    }
 });
+
 
 app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {

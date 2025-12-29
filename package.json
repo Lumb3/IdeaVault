@@ -1,18 +1,17 @@
 {
   "name": "IdeaVault",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "productName": "IdeaVault",
   "description": "A desktop note and idea management app with voice-to-text capabilities",
   "main": "src/main.js",
-  "author": "Erik",
+  "author": "Eric",
   "license": "MIT",
   "scripts": {
     "start": "electron .",
     "build": "electron-builder",
     "build:mac": "electron-builder --mac",
     "build:win": "electron-builder --win",
-    "build:all": "electron-builder --mac --win",
-    "rebuild:speech": "pyinstaller speech_service.spec"
+    "build:all": "electron-builder --mac --win"
   },
   "devDependencies": {
     "electron": "^39.2.0",
@@ -35,12 +34,17 @@
       "package.json"
     ],
     "extraResources": [
+      ".env",
       {
         "from": "dist/speech_service",
-        "to": "backend/speech_service",
+        "to": "speech_service",
         "filter": [
           "**/*"
         ]
+      },
+      {
+        "from": "models",
+        "to": "models"
       }
     ],
     "directories": {
