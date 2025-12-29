@@ -36,7 +36,8 @@ Electron.js • PostgreSQL • bcrypt.js • Node.js
 1. Launch the app and log in using the provided credentials
 2. Click **+** to create a new note
 3. Select a note to format it with **bold**, _italic_, <u>underline</u>, or highlighter
-4. Use the **Exit** button to ensure your data is saved properly
+4. Click the **mic** button to start converting your speech to text
+5. Use the **Exit** button to ensure your data is saved properly
 
 ---
 
@@ -49,6 +50,7 @@ Electron.js • PostgreSQL • bcrypt.js • Node.js
   <img src="imgs/example.png" width="500" alt="Main Page">
   <img src="imgs/dark.png" width="500" alt="Dark Mode">
   <img src="imgs/download.png" width="500" alt="Download Format">
+  <img src="imgs/speech_service.png" width="500" alt="Speech Service">
 </p>
 
 ---
