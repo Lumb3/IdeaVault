@@ -1,0 +1,15 @@
+# .github/workflows/update-deps.yml
+name: Update Dependencies
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Run the script on every Monday 9am
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: npx npm-check-updates -u && npm install
+      - uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: "chore: auto-update dependencies"
+          title: "chore: auto-update dependencies"
