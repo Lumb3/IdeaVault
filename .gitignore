@@ -7,3 +7,4 @@ build/
 *.env
 /release
 /.idea
+.DS_Store

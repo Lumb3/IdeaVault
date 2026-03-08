@@ -29,7 +29,7 @@ Electron.js • Node.js • PostgreSQL • Supabase • bcrypt.js
 
 1. Download **v3.0.0** from [Releases](https://github.com/Lumb3/IdeaVault/releases/tag/beta_test)
 2. Install the `mac-arm64` or `.zip` file
-3. Open the app, enjoy the show
+3. Open the app
 
 > **macOS Gatekeeper Note:**
 > If macOS blocks the app on first launch, right-click the app → **Open**.
