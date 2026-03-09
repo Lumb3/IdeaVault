@@ -13,4 +13,4 @@ updates:
       - "dependencies"
     assignees:
       - "Lumb3"
-    versioning-strategy: auto
+    versioning-strategy: auto 
