@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/" 
+    schedule:
+      interval: "weekly" 
+      time: "09:00"
+      timezone: "America/Denver"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore"
+    labels:
+      - "dependencies"
+    assignees:
+      - "Lumb3"
+    versioning-strategy: auto
