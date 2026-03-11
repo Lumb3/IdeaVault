@@ -1,3 +1,4 @@
+// testSetup.ts
 import { beforeEach, vi, afterEach } from "vitest";
 // Dom setup goes in here
 function setupDom() {
@@ -13,7 +14,9 @@ function setupDom() {
 }
 
 beforeEach(async () => {
-    setupDom(); // Run the DOM
+    vi.resetModules();
+    setupDom(); // Build the DOM
+
     (window as any).authAPI = {
         login: vi.fn()
     };
@@ -23,11 +26,8 @@ beforeEach(async () => {
         value: { href: "" },
         writable: true,
     });
-
-    // import the login script after dom is ready
-    // await import("../login");
 });
+
 afterEach(() => {
-    vi.resetAllMocks();
     vi.clearAllMocks();
 });
