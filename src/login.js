@@ -1,3 +1,5 @@
+// login.js
+//** Every code in here will be executed if it's being imported as a module in other files. */
 const togglePassword = document.getElementById("togglePassword");
 const password = document.getElementById("password");
 const toggle_Lock = document.getElementById("toggleLock");
@@ -6,14 +8,14 @@ const alertBox = document.getElementById("alert");
 const loginBtn = document.getElementById("loginBtn");
 const signUp = document.getElementById("signupBtn");
 
-togglePassword.addEventListener("click", function () {
+export function toggleEyes() {
   // Toggle password visibility
-  const type =
-    password.getAttribute("type") === "password" ? "text" : "password";
+  const type = password.getAttribute("type") === "password" ? "text" : "password";
   password.setAttribute("type", type);
   this.classList.toggle("fa-eye-slash");
   this.classList.toggle("fa-eye");
-});
+}
+togglePassword.addEventListener("click", toggleEyes);
 
 // Will be encrypted through hashing
 loginBtn.addEventListener("click", checkPasswordandUsername);
