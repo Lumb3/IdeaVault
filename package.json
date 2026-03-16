@@ -18,7 +18,7 @@
     "@vitest/ui": "^4.0.18",
     "electron": "^41.0.2",
     "electron-builder": "^26.0.12",
-    "jsdom": "^28.1.0",
+    "jsdom": "^29.0.0",
     "vitest": "^4.1.0"
   },
   "dependencies": {
