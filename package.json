@@ -19,7 +19,7 @@
     "electron": "^41.0.3",
     "electron-builder": "^26.0.12",
     "jsdom": "^29.0.1",
-    "vitest": "^4.1.0"
+    "vitest": "^4.1.1"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.100.0",
