@@ -24,7 +24,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.106.2",
     "bcryptjs": "^3.0.3",
-    "docx": "^9.6.1",
+    "docx": "^9.7.0",
     "dotenv": "^17.4.2",
     "pg": "^8.21.0"
   },
