@@ -15,7 +15,7 @@
     "build:all": "electron-builder --mac --win"
   },
   "devDependencies": {
-    "@vitest/ui": "^4.1.11",
+    "@vitest/ui": "^5.0.0",
     "electron": "^44.1.0",
     "electron-builder": "^26.15.3",
     "jsdom": "^30.0.1",
