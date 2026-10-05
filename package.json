@@ -26,7 +26,7 @@
     "bcryptjs": "^3.0.3",
     "docx": "^9.8.1",
     "dotenv": "^18.0.4",
-    "pg": "^8.23.0"
+    "pg": "^8.23.1"
   },
   "build": {
     "appId": "com.erik.ideavault",
